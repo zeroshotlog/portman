@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "crates/portman_core",
+    "crates/portman_cli",
+    "crates/portman_mcp",
+]
+resolver = "2"

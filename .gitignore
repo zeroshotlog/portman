@@ -1,0 +1,6 @@
+target/
+**/*.rs.bk
+*.sqlite
+*.db
+.DS_Store
+.vscode/

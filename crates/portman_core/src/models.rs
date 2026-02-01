@@ -1,0 +1,64 @@
+use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
+use std::fmt;
+use thiserror::Error;
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct LiveListener {
+    pub port: u16,
+    pub pid: Option<i32>,
+    pub process: Option<String>,
+    pub command: Option<String>,
+    pub inferred_type: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct EnrichedListener {
+    pub listener: LiveListener,
+    pub label: Option<Label>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum LabelKeyType {
+    Port,
+    Pid,
+    Pattern,
+}
+
+impl fmt::Display for LabelKeyType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LabelKeyType::Port => write!(f, "port"),
+            LabelKeyType::Pid => write!(f, "pid"),
+            LabelKeyType::Pattern => write!(f, "pattern"),
+        }
+    }
+}
+
+#[derive(Debug, Error)]
+#[error("Invalid key type: {0}")]
+pub struct ParseLabelKeyTypeError(String);
+
+impl std::str::FromStr for LabelKeyType {
+    type Err = ParseLabelKeyTypeError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "port" => Ok(LabelKeyType::Port),
+            "pid" => Ok(LabelKeyType::Pid),
+            "pattern" => Ok(LabelKeyType::Pattern),
+            _ => Err(ParseLabelKeyTypeError(s.to_string())),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct Label {
+    pub id: Option<i64>,
+    pub key_type: LabelKeyType,
+    pub key_value: String,
+    pub name: String,
+    pub note: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}

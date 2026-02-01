@@ -1,0 +1,23 @@
+[package]
+name = "portman-cli"
+version = "0.1.0"
+edition = "2021"
+description = "CLI tool for Portman, checking local ports and managing labels."
+license = "MIT"
+repository = "https://github.com/your/portman"
+authors = ["Your Name <your.email@example.com>"]
+default-run = "portman"
+
+[[bin]]
+name = "portman"
+path = "src/main.rs"
+
+[dependencies]
+portman-core = { path = "../portman_core", version = "0.1.0" }
+clap = { version = "4.4", features = ["derive"] }
+comfy-table = "7.1"
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+anyhow = "1.0"
+colored = "2.0"
+chrono = "0.4.43"
