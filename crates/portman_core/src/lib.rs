@@ -6,7 +6,3 @@ pub mod resolver;
 pub mod app;
 
 pub use app::Portman;
-
-pub fn hello() -> String {
-    "Hello from portman_core".to_string()
-}

@@ -1,10 +1,10 @@
 use std::path::{Path, PathBuf};
-use crate::models::{LiveListener, Label, EnrichedListener, LabelKeyType};
+use crate::models::{Label, EnrichedListener, LabelKeyType};
 use crate::repository::SqliteLabelRepository;
 use crate::scanner::scan_listeners;
 use crate::resolver::resolve_enrichment;
 use crate::allocator::find_free_ports;
-use anyhow::{Result, Ok};
+use anyhow::Result;
 
 pub struct Portman {
     repo: SqliteLabelRepository,

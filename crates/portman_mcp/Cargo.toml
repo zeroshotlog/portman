@@ -1,11 +1,13 @@
 [package]
 name = "portman-mcp"
 version = "0.1.0"
-edition = "2021"
-description = "MCP server for Portman, enabling Claude connection."
-license = "MIT"
-repository = "https://github.com/your/portman"
-authors = ["Your Name <your.email@example.com>"]
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "MCP server for Portman, enabling AI agent integration for local port management."
+readme = "../../README.md"
+keywords = ["mcp", "port", "macos", "ai", "claude"]
+categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
 name = "portman-mcp"

@@ -73,3 +73,69 @@ pub fn resolve_enrichment(listeners: Vec<LiveListener>, labels: Vec<Label>) -> V
         }
     }).collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+
+    fn make_listener(port: u16, pid: Option<i32>, process: Option<&str>) -> LiveListener {
+        LiveListener {
+            port,
+            pid,
+            process: process.map(|s| s.to_string()),
+            command: None,
+            inferred_type: None,
+        }
+    }
+
+    fn make_label(key_type: LabelKeyType, key_value: &str, name: &str) -> Label {
+        Label {
+            id: None,
+            key_type,
+            key_value: key_value.to_string(),
+            name: name.to_string(),
+            note: None,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        }
+    }
+
+    #[test]
+    fn test_pid_label_takes_priority_over_port() {
+        let listeners = vec![make_listener(3000, Some(100), Some("node"))];
+        let labels = vec![
+            make_label(LabelKeyType::Port, "3000", "port-label"),
+            make_label(LabelKeyType::Pid, "100", "pid-label"),
+        ];
+        let enriched = resolve_enrichment(listeners, labels);
+        assert_eq!(enriched[0].label.as_ref().unwrap().name, "pid-label");
+    }
+
+    #[test]
+    fn test_port_label_takes_priority_over_pattern() {
+        let listeners = vec![make_listener(3000, None, Some("node"))];
+        let labels = vec![
+            make_label(LabelKeyType::Pattern, "node", "pattern-label"),
+            make_label(LabelKeyType::Port, "3000", "port-label"),
+        ];
+        let enriched = resolve_enrichment(listeners, labels);
+        assert_eq!(enriched[0].label.as_ref().unwrap().name, "port-label");
+    }
+
+    #[test]
+    fn test_pattern_matches_process_name() {
+        let listeners = vec![make_listener(9999, None, Some("uvicorn"))];
+        let labels = vec![make_label(LabelKeyType::Pattern, "uvi.*", "api")];
+        let enriched = resolve_enrichment(listeners, labels);
+        assert_eq!(enriched[0].label.as_ref().unwrap().name, "api");
+    }
+
+    #[test]
+    fn test_no_label_matched() {
+        let listeners = vec![make_listener(9999, None, Some("myapp"))];
+        let labels = vec![make_label(LabelKeyType::Port, "3000", "other")];
+        let enriched = resolve_enrichment(listeners, labels);
+        assert!(enriched[0].label.is_none());
+    }
+}

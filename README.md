@@ -1,5 +1,8 @@
 # Portman
 
+[![crates.io](https://img.shields.io/crates/v/portman-mcp.svg)](https://crates.io/crates/portman-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Portmanは、macOS向けのローカルポート使用状況の可視化・管理ツールです。CLIツールおよびMCP（Model Context Protocol）サーバーとして機能します。
 開発者が「どのポートが使用中か」を即座に把握し、ポート競合や開発環境の混乱を防ぐために作られました。
 
@@ -18,11 +21,17 @@ Portmanは、macOS向けのローカルポート使用状況の可視化・管�
 
 ## インストール
 
+### crates.io からインストール（推奨）
+```bash
+# MCPサーバー（AIエージェント連携用）
+cargo install portman-mcp
+
+# CLIツール（MCPサーバーと一緒にインストールされるportman-coreに含まれる機能をCLIで使う場合）
+cargo install --path crates/portman_cli
+```
+
 ### ソースからビルドしてインストール
 ```bash
-git clone https://github.com/your/portman
-cd portman
-
 # CLIツールのインストール
 cargo install --path crates/portman_cli
 
@@ -120,20 +129,14 @@ claude mcp add portman -- ~/.cargo/bin/portman-mcp
 
 ## crates.io への公開手順（メンテナ向け）
 
-本パッケージは `crates.io` への公開に対応しています。
 依存関係があるため、以下の順序で公開してください：
 
-1. **portman-core** の公開
+1. **portman-core** の公開（portman-mcpの依存先）
    ```bash
    cargo publish -p portman-core
    ```
 
-2. **portman-cli** の公開
-   ```bash
-   cargo publish -p portman-cli
-   ```
-
-3. **portman-mcp** の公開
+2. **portman-mcp** の公開
    ```bash
    cargo publish -p portman-mcp
    ```

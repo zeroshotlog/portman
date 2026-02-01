@@ -1,11 +1,13 @@
 [package]
 name = "portman-cli"
 version = "0.1.0"
-edition = "2021"
-description = "CLI tool for Portman, checking local ports and managing labels."
-license = "MIT"
-repository = "https://github.com/your/portman"
-authors = ["Your Name <your.email@example.com>"]
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "CLI tool for Portman, checking local ports and managing labels on macOS."
+readme = "../../README.md"
+keywords = ["port", "cli", "macos", "development", "network"]
+categories = ["command-line-utilities"]
 default-run = "portman"
 
 [[bin]]

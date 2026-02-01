@@ -5,3 +5,8 @@ members = [
     "crates/portman_mcp",
 ]
 resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+authors = ["ZSL <zeroshotlog.dev@gmail.com>"]

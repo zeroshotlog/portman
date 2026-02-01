@@ -62,3 +62,30 @@ pub struct Label {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_label_key_type_from_str() {
+        assert_eq!("port".parse::<LabelKeyType>().unwrap(), LabelKeyType::Port);
+        assert_eq!("pid".parse::<LabelKeyType>().unwrap(), LabelKeyType::Pid);
+        assert_eq!("pattern".parse::<LabelKeyType>().unwrap(), LabelKeyType::Pattern);
+        assert_eq!("PORT".parse::<LabelKeyType>().unwrap(), LabelKeyType::Port);
+    }
+
+    #[test]
+    fn test_label_key_type_from_str_invalid() {
+        assert!("invalid".parse::<LabelKeyType>().is_err());
+    }
+
+    #[test]
+    fn test_label_key_type_display_roundtrip() {
+        for variant in [LabelKeyType::Port, LabelKeyType::Pid, LabelKeyType::Pattern] {
+            let s = variant.to_string();
+            let parsed: LabelKeyType = s.parse().unwrap();
+            assert_eq!(parsed, variant);
+        }
+    }
+}

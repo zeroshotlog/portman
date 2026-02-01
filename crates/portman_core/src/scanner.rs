@@ -1,15 +1,26 @@
 use std::process::Command;
+use std::sync::OnceLock;
 use crate::models::LiveListener;
 use regex::Regex;
 use std::io;
 
+static LSOF_RE: OnceLock<Regex> = OnceLock::new();
+
+fn lsof_regex() -> &'static Regex {
+    LSOF_RE.get_or_init(|| {
+        Regex::new(r"^(?P<command>\S+)\s+(?P<pid>\d+)\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(?P<name>.*)$")
+            .expect("Invalid built-in regex")
+    })
+}
+
 pub fn scan_listeners() -> io::Result<Vec<LiveListener>> {
     let output = Command::new("lsof")
-        .args(&["-nP", "-iTCP", "-sTCP:LISTEN"])
+        .args(["-nP", "-iTCP", "-sTCP:LISTEN"])
         .output()?;
-        
+
+    // lsof returns exit code 1 when no listeners found, which is valid
     if !output.status.success() && output.status.code() != Some(1) {
-         return Err(io::Error::new(io::ErrorKind::Other, "lsof failed"));
+         return Err(io::Error::other("lsof failed"));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -19,8 +30,8 @@ pub fn scan_listeners() -> io::Result<Vec<LiveListener>> {
 fn parse_lsof_output(output: &str) -> io::Result<Vec<LiveListener>> {
     let mut listeners = Vec::new();
     let lines: Vec<&str> = output.lines().collect();
-    
-    let re = Regex::new(r"^(?P<command>\S+)\s+(?P<pid>\d+)\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(?P<name>.*)$").unwrap();
+
+    let re = lsof_regex();
 
     for line in lines.iter().skip(1) {
         if line.trim().is_empty() { continue; }
@@ -61,7 +72,7 @@ fn extract_port(name_field: &str) -> Option<u16> {
 fn infer_type(process: Option<&str>, port: u16) -> Option<String> {
     // Port based heuristics
     match port {
-        3000 | 3001..=3010 => return Some("react/next".to_string()),
+        3000..=3010 => return Some("react/next".to_string()),
         5173 | 4173 => return Some("vite".to_string()),
         8000 | 8080 => return Some("http-server".to_string()),
         5432 => return Some("postgres".to_string()),
@@ -100,9 +111,61 @@ node      12345 reverseblade   20u  IPv4 0x...      0t0  TCP *:3000 (LISTEN)
         assert_eq!(parsed[0].port, 5000);
         assert_eq!(parsed[0].pid, Some(62719));
         assert_eq!(parsed[0].process.as_deref(), Some("control"));
-        
+
         assert_eq!(parsed[1].port, 3000);
         assert_eq!(parsed[1].process.as_deref(), Some("node"));
         assert_eq!(parsed[1].inferred_type.as_deref(), Some("react/next"));
+    }
+
+    #[test]
+    fn test_parse_lsof_empty_output() {
+        let parsed = parse_lsof_output("").unwrap();
+        assert!(parsed.is_empty());
+    }
+
+    #[test]
+    fn test_parse_lsof_header_only() {
+        let sample = "COMMAND     PID         USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME\n";
+        let parsed = parse_lsof_output(sample).unwrap();
+        assert!(parsed.is_empty());
+    }
+
+    #[test]
+    fn test_extract_port_ipv4() {
+        assert_eq!(extract_port("127.0.0.1:5000 (LISTEN)"), Some(5000));
+    }
+
+    #[test]
+    fn test_extract_port_wildcard() {
+        assert_eq!(extract_port("*:3000 (LISTEN)"), Some(3000));
+    }
+
+    #[test]
+    fn test_extract_port_ipv6() {
+        assert_eq!(extract_port("[::1]:8080 (LISTEN)"), Some(8080));
+    }
+
+    #[test]
+    fn test_infer_type_by_port() {
+        assert_eq!(infer_type(None, 5173), Some("vite".to_string()));
+        assert_eq!(infer_type(None, 3000), Some("react/next".to_string()));
+        assert_eq!(infer_type(None, 5432), Some("postgres".to_string()));
+        assert_eq!(infer_type(None, 6379), Some("redis".to_string()));
+        assert_eq!(infer_type(None, 3306), Some("mysql".to_string()));
+        assert_eq!(infer_type(None, 8080), Some("http-server".to_string()));
+    }
+
+    #[test]
+    fn test_infer_type_by_process() {
+        assert_eq!(infer_type(Some("node"), 9999), Some("node".to_string()));
+        assert_eq!(infer_type(Some("python3"), 9999), Some("python".to_string()));
+        assert_eq!(infer_type(Some("uvicorn"), 9999), Some("python".to_string()));
+        assert_eq!(infer_type(Some("com.docker.backend"), 9999), Some("docker".to_string()));
+    }
+
+    #[test]
+    fn test_infer_type_unknown() {
+        assert_eq!(infer_type(Some("myapp"), 9999), None);
+        assert_eq!(infer_type(None, 9999), None);
     }
 }
