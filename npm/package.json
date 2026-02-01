@@ -1,0 +1,25 @@
+{
+  "name": "portman-mcp",
+  "version": "0.2.1",
+  "description": "MCP server for local port management on macOS. Scan active listeners, find free ports, and manage labels.",
+  "bin": {
+    "portman-mcp": "bin/portman-mcp.js"
+  },
+  "os": [
+    "darwin"
+  ],
+  "keywords": [
+    "mcp",
+    "port",
+    "macos",
+    "claude",
+    "ai",
+    "development"
+  ],
+  "license": "MIT",
+  "files": [
+    "bin/",
+    "binaries/"
+  ],
+  "author": "ZSL <zeroshotlog.dev@gmail.com>"
+}

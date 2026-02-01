@@ -4,3 +4,4 @@ target/
 *.db
 .DS_Store
 .vscode/
+npm/binaries/

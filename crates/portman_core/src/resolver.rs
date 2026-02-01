@@ -86,6 +86,8 @@ mod tests {
             process: process.map(|s| s.to_string()),
             command: None,
             inferred_type: None,
+            cwd: None,
+            cwd_short: None,
         }
     }
 

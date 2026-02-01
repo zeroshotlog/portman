@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use std::process::Command;
 use std::sync::OnceLock;
-use crate::models::LiveListener;
+use crate::models::{LiveListener, shorten_path};
 use regex::Regex;
 use std::io;
 
@@ -24,7 +25,53 @@ pub fn scan_listeners() -> io::Result<Vec<LiveListener>> {
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    parse_lsof_output(&stdout)
+    let mut listeners = parse_lsof_output(&stdout)?;
+
+    // Batch-fetch cwd for all PIDs
+    let pids: Vec<i32> = listeners.iter().filter_map(|l| l.pid).collect();
+    if !pids.is_empty() {
+        let cwds = get_cwds(&pids);
+        for listener in &mut listeners {
+            if let Some(pid) = listener.pid {
+                if let Some(cwd) = cwds.get(&pid) {
+                    listener.cwd_short = Some(shorten_path(cwd));
+                    listener.cwd = Some(cwd.clone());
+                }
+            }
+        }
+    }
+
+    Ok(listeners)
+}
+
+fn get_cwds(pids: &[i32]) -> HashMap<i32, String> {
+    let pid_args: Vec<String> = pids.iter().map(|p| p.to_string()).collect();
+    let pid_list = pid_args.join(",");
+
+    let output = Command::new("lsof")
+        .args(["-d", "cwd", "-Fn", "-p", &pid_list])
+        .output();
+
+    let mut map = HashMap::new();
+    let output = match output {
+        Ok(o) => o,
+        Err(_) => return map,
+    };
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut current_pid: Option<i32> = None;
+
+    for line in stdout.lines() {
+        if let Some(pid_str) = line.strip_prefix('p') {
+            current_pid = pid_str.parse::<i32>().ok();
+        } else if let Some(path) = line.strip_prefix('n') {
+            if let Some(pid) = current_pid {
+                map.insert(pid, path.to_string());
+            }
+        }
+    }
+
+    map
 }
 
 fn parse_lsof_output(output: &str) -> io::Result<Vec<LiveListener>> {
@@ -49,8 +96,10 @@ fn parse_lsof_output(output: &str) -> io::Result<Vec<LiveListener>> {
                     port,
                     pid,
                     process: command_name.clone(),
-                    command: None, 
+                    command: None,
                     inferred_type: inferred,
+                    cwd: None,
+                    cwd_short: None,
                 });
             }
         }

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 use std::fmt;
+use std::path::Path;
 use thiserror::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -10,6 +11,24 @@ pub struct LiveListener {
     pub process: Option<String>,
     pub command: Option<String>,
     pub inferred_type: Option<String>,
+    pub cwd: Option<String>,
+    pub cwd_short: Option<String>,
+}
+
+/// Shorten a path to the last 2 components (e.g. "/Users/foo/personal/myapp" -> "/personal/myapp")
+pub fn shorten_path(path: &str) -> String {
+    let p = Path::new(path);
+    let components: Vec<&str> = p.components()
+        .filter_map(|c| c.as_os_str().to_str())
+        .collect();
+    let len = components.len();
+    if len >= 2 {
+        format!("/{}/{}", components[len - 2], components[len - 1])
+    } else if len == 1 {
+        format!("/{}", components[0])
+    } else {
+        path.to_string()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

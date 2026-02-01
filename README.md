@@ -85,36 +85,70 @@ portman label set --pattern "uvicorn.*main:app" --name "API Backend"
 
 AIエージェント（Claude Code 等）からPortmanを利用するための設定です。
 
-### 1. Claude Code への追加（推奨）
-
-最新の `claude` CLI を使用している場合、以下のコマンドだけで追加できます：
+### 1. Claude Code
 
 ```bash
-# パスが通っている場合
-claude mcp add portman -- portman-mcp
-
-# うまくいかない場合（絶対パス指定）
-claude mcp add portman -- ~/.cargo/bin/portman-mcp
+claude mcp add portman -- npx portman-mcp
 ```
 
-※ `portman-mcp` にパスが通っている（`cargo install` 済み）必要があります。
+### 2. Claude Desktop
 
-### 2. Claude Desktop (GUI) / Antigravity
-
-設定ファイル（`claude_desktop_config.json` 等）に以下を追記してください：
+`claude_desktop_config.json` に以下を追記してください：
 
 ```json
 {
   "mcpServers": {
     "portman": {
-      "command": "portman-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["portman-mcp"]
     }
   }
 }
 ```
 
-パスが通っていない場合は、`command` に絶対パス（例: `/Users/username/.cargo/bin/portman-mcp`）を指定してください。
+### 3. Antigravity
+
+`~/.gemini/antigravity/mcp_config.json` に以下を追記してください：
+
+```json
+{
+  "mcpServers": {
+    "portman": {
+      "command": "npx",
+      "args": ["portman-mcp"]
+    }
+  }
+}
+```
+
+### アップデート方法
+
+npx はパッケージをローカルにキャッシュします。最新版に更新するには：
+
+```bash
+npx portman-mcp@latest
+```
+
+常に最新版を使用したい場合は、MCP設定で `portman-mcp@latest` を指定してください：
+
+```bash
+# Claude Code
+claude mcp remove portman
+claude mcp add portman -- npx -y portman-mcp@latest
+```
+
+Claude Desktop (`claude_desktop_config.json`) / Antigravity (`~/.gemini/antigravity/mcp_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "portman": {
+      "command": "npx",
+      "args": ["-y", "portman-mcp@latest"]
+    }
+  }
+}
+```
 
 ### 提供されるツール一覧
 
