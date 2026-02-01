@@ -1,11 +1,11 @@
 [package]
 name = "portman-core"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 description = "Core library for Portman, a macOS local port manager and visibility tool."
-readme = "../../README.md"
+readme = "../../README.crates-io.md"
 keywords = ["port", "network", "macos", "development", "mcp"]
 categories = ["command-line-utilities", "network-programming"]
 
