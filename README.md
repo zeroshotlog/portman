@@ -81,7 +81,11 @@ AIエージェント（Claude Code 等）からPortmanを利用するための�
 最新の `claude` CLI を使用している場合、以下のコマンドだけで追加できます：
 
 ```bash
+# パスが通っている場合
 claude mcp add portman -- portman-mcp
+
+# うまくいかない場合（絶対パス指定）
+claude mcp add portman -- ~/.cargo/bin/portman-mcp
 ```
 
 ※ `portman-mcp` にパスが通っている（`cargo install` 済み）必要があります。

@@ -178,7 +178,7 @@ async fn handle_request(req: JsonRpcRequest, app: Arc<Mutex<AppState>>) -> JsonR
                             "required": ["pattern", "name"]
                         }
                     },
-                    {
+                     {
                         "name": "label_remove_port",
                         "description": "Remove label by port",
                         "inputSchema": {
@@ -188,8 +188,29 @@ async fn handle_request(req: JsonRpcRequest, app: Arc<Mutex<AppState>>) -> JsonR
                             },
                             "required": ["port"]
                         }
+                    },
+                    {
+                        "name": "label_remove_pid",
+                        "description": "Remove label by PID",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "pid": { "type": "integer" }
+                            },
+                            "required": ["pid"]
+                        }
+                    },
+                    {
+                        "name": "label_remove_pattern",
+                        "description": "Remove label by pattern",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "pattern": { "type": "string" }
+                            },
+                            "required": ["pattern"]
+                        }
                     }
-                    // Add other remove variants if needed
                 ]
             }))
         },
@@ -345,6 +366,20 @@ async fn handle_tool_call(params: Option<&Value>, app: Arc<Mutex<AppState>>) -> 
         "label_remove_port" => {
              let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
              app.portman.remove_label(LabelKeyType::Port, &port.to_string())?;
+              Ok(json!({
+                 "content": [{ "type": "text", "text": "OK" }]
+             }))
+        },
+        "label_remove_pid" => {
+             let pid = args.get("pid").and_then(|v| v.as_i64()).ok_or_else(|| anyhow::anyhow!("Missing pid"))? as i32;
+             app.portman.remove_label(LabelKeyType::Pid, &pid.to_string())?;
+              Ok(json!({
+                 "content": [{ "type": "text", "text": "OK" }]
+             }))
+        },
+        "label_remove_pattern" => {
+             let pattern = args.get("pattern").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing pattern"))?.to_string();
+             app.portman.remove_label(LabelKeyType::Pattern, &pattern)?;
               Ok(json!({
                  "content": [{ "type": "text", "text": "OK" }]
              }))
