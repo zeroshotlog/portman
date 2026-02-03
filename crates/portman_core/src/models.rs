@@ -13,6 +13,7 @@ pub struct LiveListener {
     pub inferred_type: Option<String>,
     pub cwd: Option<String>,
     pub cwd_short: Option<String>,
+    pub url: String,
 }
 
 /// Shorten a path to the last 2 components (e.g. "/Users/foo/personal/myapp" -> "/personal/myapp")

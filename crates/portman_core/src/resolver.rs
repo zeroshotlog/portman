@@ -88,6 +88,7 @@ mod tests {
             inferred_type: None,
             cwd: None,
             cwd_short: None,
+            url: format!("http://localhost:{}/", port),
         }
     }
 

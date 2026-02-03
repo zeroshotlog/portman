@@ -98,15 +98,15 @@ fn main() -> Result<()> {
                 println!("{}", serde_json::to_string_pretty(&listeners)?);
             } else {
                 let mut table = Table::new();
-                table.set_header(vec!["Port", "PID", "Process", "Inferred", "Label", "Note"]);
-                
+                table.set_header(vec!["Port", "PID", "Process", "Inferred", "Label", "Note", "URL"]);
+
                 for item in listeners {
                     let l = item.listener;
                     let label = item.label;
-                    
+
                     let label_name = label.as_ref().map(|l| l.name.as_str()).unwrap_or("");
                     let label_note = label.as_ref().and_then(|l| l.note.as_deref()).unwrap_or("");
-                    
+
                     table.add_row(vec![
                         l.port.to_string(),
                         l.pid.map(|p| p.to_string()).unwrap_or("-".into()),
@@ -114,6 +114,7 @@ fn main() -> Result<()> {
                         l.inferred_type.unwrap_or("-".into()),
                         label_name.to_string(),
                         label_note.to_string(),
+                        l.url,
                     ]);
                 }
                 println!("{table}");

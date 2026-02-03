@@ -100,6 +100,7 @@ fn parse_lsof_output(output: &str) -> io::Result<Vec<LiveListener>> {
                     inferred_type: inferred,
                     cwd: None,
                     cwd_short: None,
+                    url: format!("http://localhost:{}/", port),
                 });
             }
         }
