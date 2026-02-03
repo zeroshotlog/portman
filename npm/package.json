@@ -1,6 +1,6 @@
 {
   "name": "portman-mcp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "MCP server for local port management on macOS. Scan active listeners, find free ports, and manage labels.",
   "bin": {
     "portman-mcp": "bin/portman-mcp.js"
