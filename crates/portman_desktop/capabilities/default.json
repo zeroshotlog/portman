@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicholasio/tauri-deb-example/refs/heads/main/src-tauri/gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open"
+  ]
+}
