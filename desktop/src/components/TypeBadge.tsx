@@ -1,3 +1,5 @@
+import { useThemeContext } from "../contexts/ThemeContext";
+
 const TYPE_STYLES: Record<string, { bg: string; color: string; border: string; darkBg: string; darkColor: string; darkBorder: string }> = {
   "react/next": { bg: "#cffafe", color: "#0e7490", border: "#a5f3fc", darkBg: "rgba(8,145,178,0.25)",  darkColor: "#67e8f9", darkBorder: "rgba(8,145,178,0.4)" },
   vite:         { bg: "#f3e8ff", color: "#7e22ce", border: "#e9d5ff", darkBg: "rgba(126,34,206,0.25)", darkColor: "#d8b4fe", darkBorder: "rgba(126,34,206,0.4)" },
@@ -16,9 +18,10 @@ const TYPE_STYLES: Record<string, { bg: string; color: string; border: string; d
 const FALLBACK = { bg: "#f4f4f5", color: "#71717a", border: "#e4e4e7", darkBg: "rgba(63,63,70,0.3)", darkColor: "#a1a1aa", darkBorder: "rgba(63,63,70,0.5)" };
 
 export function TypeBadge({ type }: { type: string | null }) {
+  const { theme } = useThemeContext();
   if (!type) return null;
   const s = TYPE_STYLES[type] ?? FALLBACK;
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  const isDark = theme === "dark";
 
   return (
     <span
