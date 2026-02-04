@@ -8,9 +8,10 @@ interface Props {
   onSearchChange: (query: string) => void;
   onRefresh: () => void;
   loading: boolean;
+  searchInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
-export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearchChange, onRefresh, loading }: Props) {
+export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearchChange, onRefresh, loading, searchInputRef }: Props) {
   return (
     <div
       className="flex h-12 shrink-0 items-center justify-between px-4"
@@ -42,11 +43,12 @@ export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearch
           <div className="relative">
             <SearchInputIcon />
             <input
+              ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Filter ports, processes or labels..."
-              className="h-8 w-56 rounded-md pl-8 pr-3 text-xs outline-none"
+              className="h-8 w-56 rounded-md pl-8 pr-3 text-xs outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
               style={{
                 backgroundColor: "var(--bg-tertiary)",
                 border: "1px solid var(--border)",
@@ -57,10 +59,10 @@ export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearch
 
           {/* View toggle */}
           <div className="flex overflow-hidden rounded-md" style={{ border: "1px solid var(--border)" }}>
-            <ViewToggleBtn active={viewMode === "list"} onClick={() => onViewModeChange("list")} title="List view">
+            <ViewToggleBtn active={viewMode === "list"} onClick={() => onViewModeChange("list")} title="List view" ariaLabel="List view">
               <ListIcon />
             </ViewToggleBtn>
-            <ViewToggleBtn active={viewMode === "grid"} onClick={() => onViewModeChange("grid")} title="Grid view" borderLeft>
+            <ViewToggleBtn active={viewMode === "grid"} onClick={() => onViewModeChange("grid")} title="Grid view" ariaLabel="Grid view" borderLeft>
               <GridIcon />
             </ViewToggleBtn>
           </div>
@@ -71,6 +73,7 @@ export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearch
             className="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
             style={{ border: "1px solid var(--border)", color: "var(--text-label)" }}
             title="Refresh"
+            aria-label="Refresh"
           >
             <RefreshIcon />
           </button>
@@ -80,8 +83,8 @@ export function Toolbar({ tab, viewMode, onViewModeChange, searchQuery, onSearch
   );
 }
 
-function ViewToggleBtn({ active, onClick, title, borderLeft, children }: {
-  active: boolean; onClick: () => void; title: string; borderLeft?: boolean; children: React.ReactNode;
+function ViewToggleBtn({ active, onClick, title, ariaLabel, borderLeft, children }: {
+  active: boolean; onClick: () => void; title: string; ariaLabel: string; borderLeft?: boolean; children: React.ReactNode;
 }) {
   return (
     <button
@@ -93,6 +96,7 @@ function ViewToggleBtn({ active, onClick, title, borderLeft, children }: {
         borderLeft: borderLeft ? "1px solid var(--border)" : undefined,
       }}
       title={title}
+      aria-label={ariaLabel}
     >
       {children}
     </button>
@@ -102,6 +106,7 @@ function ViewToggleBtn({ active, onClick, title, borderLeft, children }: {
 function SearchInputIcon() {
   return (
     <svg
+      aria-hidden="true"
       width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
       className="absolute left-2.5 top-1/2 -translate-y-1/2"
       style={{ color: "var(--text-muted)" }}
@@ -114,7 +119,7 @@ function SearchInputIcon() {
 
 function ListIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <line x1="2" y1="4" x2="14" y2="4" />
       <line x1="2" y1="8" x2="14" y2="8" />
       <line x1="2" y1="12" x2="14" y2="12" />
@@ -124,7 +129,7 @@ function ListIcon() {
 
 function GridIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="1.5" y="1.5" width="5" height="5" rx="1" />
       <rect x="9.5" y="1.5" width="5" height="5" rx="1" />
       <rect x="1.5" y="9.5" width="5" height="5" rx="1" />
@@ -135,7 +140,7 @@ function GridIcon() {
 
 function RefreshIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2.5 8a5.5 5.5 0 0 1 9.5-3.5" />
       <path d="M13.5 8a5.5 5.5 0 0 1-9.5 3.5" />
       <polyline points="12 1 12 4.5 8.5 4.5" />

@@ -31,7 +31,7 @@ export function FreePortFinder() {
             type="number"
             value={rangeStart}
             onChange={(e) => setRangeStart(Number(e.target.value))}
-            className="h-9 w-28 rounded-lg px-3 text-[13px] outline-none"
+            className="h-9 w-28 rounded-lg px-3 text-[13px] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
             style={{
               backgroundColor: "var(--bg-tertiary)",
               border: "1px solid var(--border)",
@@ -50,7 +50,7 @@ export function FreePortFinder() {
             type="number"
             value={rangeEnd}
             onChange={(e) => setRangeEnd(Number(e.target.value))}
-            className="h-9 w-28 rounded-lg px-3 text-[13px] outline-none"
+            className="h-9 w-28 rounded-lg px-3 text-[13px] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
             style={{
               backgroundColor: "var(--bg-tertiary)",
               border: "1px solid var(--border)",
@@ -68,7 +68,7 @@ export function FreePortFinder() {
           <select
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
-            className="h-9 w-20 rounded-lg px-2 text-[13px] outline-none"
+            className="h-9 w-20 rounded-lg px-2 text-[13px] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
             style={{
               backgroundColor: "var(--bg-tertiary)",
               border: "1px solid var(--border)",

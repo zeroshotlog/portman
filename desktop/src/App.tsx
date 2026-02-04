@@ -1,11 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { ListenerTable } from "./components/ListenerTable";
 import { ListenerGrid } from "./components/ListenerGrid";
 import { FreePortFinder } from "./components/FreePortFinder";
 import { Sidebar } from "./components/Sidebar";
 import { Toolbar } from "./components/Toolbar";
 import { StatusBar } from "./components/StatusBar";
+import { Settings } from "./components/Settings";
 import { useListeners, useLabels } from "./hooks/usePortman";
+import { useThemeContext } from "./contexts/ThemeContext";
 import type { EnrichedListener } from "./types";
 
 type Tab = "ports" | "find";
@@ -27,8 +29,34 @@ function App() {
   const [filter, setFilter] = useState<Filter>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
   const { listeners, loading, error, refresh, scanTimeMs } = useListeners();
   const { setLabel, removeLabel } = useLabels();
+  const { setPreference } = useThemeContext();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Menu event listeners
+  useEffect(() => {
+    const onRefresh = () => refresh();
+    const onSetView = (e: Event) => setViewMode((e as CustomEvent).detail);
+    const onFocusSearch = () => searchInputRef.current?.focus();
+    const onOpenSettings = () => setShowSettings(true);
+    const onSetTheme = (e: Event) => setPreference((e as CustomEvent).detail);
+
+    window.addEventListener("portman:refresh", onRefresh);
+    window.addEventListener("portman:set-view", onSetView);
+    window.addEventListener("portman:focus-search", onFocusSearch);
+    window.addEventListener("portman:open-settings", onOpenSettings);
+    window.addEventListener("portman:set-theme", onSetTheme);
+
+    return () => {
+      window.removeEventListener("portman:refresh", onRefresh);
+      window.removeEventListener("portman:set-view", onSetView);
+      window.removeEventListener("portman:focus-search", onFocusSearch);
+      window.removeEventListener("portman:open-settings", onOpenSettings);
+      window.removeEventListener("portman:set-theme", onSetTheme);
+    };
+  }, [refresh, setPreference]);
 
   const unique = useMemo(() => dedup(listeners), [listeners]);
 
@@ -99,6 +127,7 @@ function App() {
             onSearchChange={setSearchQuery}
             onRefresh={refresh}
             loading={loading}
+            searchInputRef={searchInputRef}
           />
 
           <div className="min-h-0 flex-1 overflow-auto">
@@ -128,6 +157,8 @@ function App() {
       </div>
 
       <StatusBar scanTimeMs={scanTimeMs} error={error} />
+
+      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </div>
   );
 }

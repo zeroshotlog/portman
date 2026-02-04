@@ -38,7 +38,7 @@ export function LabelEditor({ port, initialName, initialNote, onSave, onCancel }
         onChange={(e) => setName(e.target.value)}
         placeholder="Label name"
         autoFocus
-        className="h-7 rounded-md px-2 text-[12px] outline-none"
+        className="h-7 rounded-md px-2 text-[12px] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
         style={{
           backgroundColor: "var(--bg-tertiary)",
           border: "1px solid var(--border)",
@@ -50,7 +50,7 @@ export function LabelEditor({ port, initialName, initialNote, onSave, onCancel }
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Note (optional)"
-        className="h-7 rounded-md px-2 text-[12px] outline-none"
+        className="h-7 rounded-md px-2 text-[12px] outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--accent)]"
         style={{
           backgroundColor: "var(--bg-tertiary)",
           border: "1px solid var(--border)",

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function Sidebar({ activeTab, onTabChange, filter, onFilterChange, counts, listenerCount }: Props) {
-  const { theme, toggleTheme } = useThemeContext();
+  const { preference, setPreference } = useThemeContext();
 
   return (
     <aside
@@ -81,12 +81,16 @@ export function Sidebar({ activeTab, onTabChange, filter, onFilterChange, counts
 
         {/* Theme toggle */}
         <button
-          onClick={toggleTheme}
+          onClick={() => {
+            const next = preference === "light" ? "dark" : preference === "dark" ? "auto" : "light";
+            setPreference(next);
+          }}
           className="mt-3 flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors"
           style={{ color: "var(--text-secondary)" }}
+          aria-label={`Theme: ${preference === "auto" ? "System" : preference === "dark" ? "Dark" : "Light"}`}
         >
-          {theme === "light" ? <MoonIcon /> : <SunIcon />}
-          {theme === "light" ? "Dark Mode" : "Light Mode"}
+          {preference === "light" ? <SunIcon /> : preference === "dark" ? <MoonIcon /> : <SystemIcon />}
+          {preference === "light" ? "Light" : preference === "dark" ? "Dark" : "System"}
         </button>
       </div>
     </aside>
@@ -131,7 +135,7 @@ function FilterItem({ active, onClick, label, count }: { active: boolean; onClic
           }}
         >
           {active && (
-            <svg width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg aria-hidden="true" width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="2 6 5 9 10 3" />
             </svg>
           )}
@@ -145,9 +149,19 @@ function FilterItem({ active, onClick, label, count }: { active: boolean; onClic
   );
 }
 
+function SystemIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="12" height="9" rx="1.5" />
+      <line x1="8" y1="11" x2="8" y2="13.5" />
+      <line x1="5" y1="13.5" x2="11" y2="13.5" />
+    </svg>
+  );
+}
+
 function PortsIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
       <line x1="12" y1="3" x2="12" y2="6" />
@@ -160,7 +174,7 @@ function PortsIcon() {
 
 function SearchIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <circle cx="10.5" cy="10.5" r="7" />
       <line x1="16" y1="16" x2="21" y2="21" />
     </svg>
@@ -169,7 +183,7 @@ function SearchIcon() {
 
 function MoonIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M13.5 8.5a5.5 5.5 0 0 1-7-7 5.5 5.5 0 1 0 7 7z" />
     </svg>
   );
@@ -177,7 +191,7 @@ function MoonIcon() {
 
 function SunIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <circle cx="8" cy="8" r="3" />
       <line x1="8" y1="1" x2="8" y2="3" />
       <line x1="8" y1="13" x2="8" y2="15" />

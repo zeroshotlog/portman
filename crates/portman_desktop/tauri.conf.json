@@ -10,6 +10,8 @@
     "frontendDist": "../../desktop/dist"
   },
   "bundle": {
+    "copyright": "Copyright 2026 zeroshotlog",
+    "shortDescription": "Local port management tool for macOS",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

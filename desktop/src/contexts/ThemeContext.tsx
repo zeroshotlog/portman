@@ -1,9 +1,11 @@
 import { createContext, useContext } from "react";
 import { useTheme } from "../hooks/useTheme";
+import type { ThemePreference, ResolvedTheme } from "../hooks/useTheme";
 
 interface ThemeContextValue {
-  theme: "light" | "dark";
-  toggleTheme: () => void;
+  preference: ThemePreference;
+  theme: ResolvedTheme;
+  setPreference: (pref: ThemePreference) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
