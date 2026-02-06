@@ -68,15 +68,6 @@ export function Sidebar({ activeTab, onTabChange, filter, onFilterChange, counts
           <div className="mt-2 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
             {listenerCount} listeners detected
           </div>
-          <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full"
-            style={{ backgroundColor: "var(--stats-bar)" }}
-          >
-            <div
-              className="h-1.5 rounded-full"
-              style={{ backgroundColor: "var(--success)", width: "65%" }}
-            />
-          </div>
         </div>
 
         {/* Theme toggle */}
@@ -142,7 +133,7 @@ function FilterItem({ active, onClick, label, count }: { active: boolean; onClic
         </span>
         {label}
       </span>
-      <span className="font-mono text-xs" style={{ opacity: 0.6 }}>
+      <span className="font-mono text-xs" style={{ color: "var(--text-muted)" }}>
         {count}
       </span>
     </button>

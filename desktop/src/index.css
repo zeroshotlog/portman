@@ -36,7 +36,7 @@
   --text-primary: #e4e4e7;     /* zinc-200 */
   --text-secondary: #d4d4d8;   /* zinc-300 */
   --text-muted: #a1a1aa;       /* zinc-400 */
-  --text-label: #71717a;       /* zinc-500 */
+  --text-label: #a1a1aa;       /* zinc-400 — WCAG AA on zinc-900 */
   --accent: #3b82f6;           /* blue-500 */
   --accent-hover: #2563eb;     /* blue-600 */
   --accent-soft: rgba(30,58,138,0.2); /* blue-900/20 */

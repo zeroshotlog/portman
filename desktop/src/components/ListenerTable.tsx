@@ -3,6 +3,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import type { EnrichedListener, SetLabelArgs } from "../types";
 import { TypeBadge } from "./TypeBadge";
 import { LabelEditor } from "./LabelEditor";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 interface Props {
   listeners: EnrichedListener[];
@@ -12,6 +13,7 @@ interface Props {
 
 export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
   const [editingPort, setEditingPort] = useState<number | null>(null);
+  const [removingItem, setRemovingItem] = useState<EnrichedListener | null>(null);
 
   return (
     <table className="w-full table-fixed text-left" style={{ borderCollapse: "collapse" }}>
@@ -23,19 +25,19 @@ export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
         }}
       >
         <tr style={{ borderBottom: "1px solid var(--border-light)" }}>
-          <th className="w-20 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
+          <th scope="col" className="w-20 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
             Port
           </th>
-          <th className="w-32 px-4 py-2 text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
+          <th scope="col" className="w-32 px-4 py-2 text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
             Process
           </th>
-          <th className="w-32 px-4 py-2 text-center text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
+          <th scope="col" className="w-32 px-4 py-2 text-center text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
             Type
           </th>
-          <th className="px-4 py-2 text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
+          <th scope="col" className="px-4 py-2 text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
             Label
           </th>
-          <th className="w-20 px-4 py-2 text-right font-mono text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
+          <th scope="col" className="w-20 px-4 py-2 text-right font-mono text-[11px] font-bold uppercase tracking-tight" style={{ color: "var(--text-muted)" }}>
             PID
           </th>
         </tr>
@@ -46,6 +48,8 @@ export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
             key={`${item.listener.port}-${item.listener.pid}`}
             className="group transition-colors"
             style={{ borderBottom: "1px solid var(--border-light)" }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--bg-tertiary)"}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ""}
           >
             {/* Port */}
             <td className="px-4 py-2">
@@ -78,10 +82,7 @@ export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
                   port={item.listener.port}
                   initialName={item.label?.name}
                   initialNote={item.label?.note ?? undefined}
-                  onSave={async (args) => {
-                    await onSetLabel(args);
-                    setEditingPort(null);
-                  }}
+                  onSave={(args) => onSetLabel(args)}
                   onCancel={() => setEditingPort(null)}
                 />
               ) : item.label ? (
@@ -94,30 +95,30 @@ export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
                   </span>
                   <button
                     onClick={() => setEditingPort(item.listener.port)}
-                    className="invisible text-[10px] group-hover:visible"
+                    className="invisible text-xs group-hover:visible group-focus-within:visible"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    edit
+                    Edit
                   </button>
                   <button
-                    onClick={() => onRemoveLabel("Port", String(item.listener.port))}
-                    className="invisible text-[10px] group-hover:visible"
+                    onClick={() => setRemovingItem(item)}
+                    className="invisible text-xs group-hover:visible group-focus-within:visible"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    remove
+                    Delete
                   </button>
                 </div>
               ) : (
                 <div>
                   <span
-                    className="text-sm italic group-hover:hidden"
+                    className="text-sm italic group-hover:hidden group-focus-within:hidden"
                     style={{ color: "var(--text-label)" }}
                   >
                     No Label
                   </span>
                   <button
                     onClick={() => setEditingPort(item.listener.port)}
-                    className="hidden text-xs group-hover:inline"
+                    className="hidden text-xs group-hover:inline group-focus-within:inline"
                     style={{ color: "var(--text-muted)" }}
                   >
                     + Add label
@@ -135,6 +136,20 @@ export function ListenerTable({ listeners, onSetLabel, onRemoveLabel }: Props) {
           </tr>
         ))}
       </tbody>
+
+      {removingItem && (
+        <ConfirmDialog
+          title="Delete Label"
+          message={`Remove label "${removingItem.label?.name}" from port ${removingItem.listener.port}?`}
+          confirmLabel="Delete"
+          danger
+          onConfirm={() => {
+            onRemoveLabel("Port", String(removingItem.listener.port));
+            setRemovingItem(null);
+          }}
+          onCancel={() => setRemovingItem(null)}
+        />
+      )}
     </table>
   );
 }

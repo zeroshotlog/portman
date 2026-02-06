@@ -55,8 +55,9 @@ mod macos {
 }
 
 fn main() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_window_state::Builder::new().build())
         .setup(|_app| {
             #[cfg(target_os = "macos")]
             macos::set_app_icon();
@@ -71,6 +72,29 @@ fn main() {
             commands::remove_label,
             macos::show_about,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    app.run(|app_handle, event| {
+        use tauri::Manager;
+        match event {
+            tauri::RunEvent::WindowEvent {
+                event: tauri::WindowEvent::CloseRequested { api, .. },
+                label,
+                ..
+            } => {
+                api.prevent_close();
+                if let Some(w) = app_handle.get_webview_window(&label) {
+                    let _ = w.hide();
+                }
+            }
+            tauri::RunEvent::Reopen { .. } => {
+                if let Some(w) = app_handle.get_webview_window("main") {
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                }
+            }
+            _ => {}
+        }
+    });
 }

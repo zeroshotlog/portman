@@ -3,6 +3,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import type { EnrichedListener, SetLabelArgs } from "../types";
 import { TypeBadge } from "./TypeBadge";
 import { LabelEditor } from "./LabelEditor";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 interface Props {
   item: EnrichedListener;
@@ -13,6 +14,7 @@ interface Props {
 export function ListenerCard({ item, onSetLabel, onRemoveLabel }: Props) {
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
   return (
     <div
@@ -44,10 +46,7 @@ export function ListenerCard({ item, onSetLabel, onRemoveLabel }: Props) {
             port={item.listener.port}
             initialName={item.label?.name}
             initialNote={item.label?.note ?? undefined}
-            onSave={async (args) => {
-              await onSetLabel(args);
-              setEditing(false);
-            }}
+            onSave={(args) => onSetLabel(args)}
             onCancel={() => setEditing(false)}
           />
         ) : item.label ? (
@@ -60,27 +59,27 @@ export function ListenerCard({ item, onSetLabel, onRemoveLabel }: Props) {
                 {item.label.note}
               </p>
             )}
-            <div className="mt-1.5 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="mt-1.5 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
               <button
                 onClick={() => setEditing(true)}
-                className="text-[10px] transition-colors"
+                className="text-xs transition-colors"
                 style={{ color: "var(--text-muted)" }}
               >
-                edit
+                Edit
               </button>
               <button
-                onClick={() => onRemoveLabel("Port", String(item.listener.port))}
-                className="text-[10px] transition-colors"
+                onClick={() => setShowRemoveConfirm(true)}
+                className="text-xs transition-colors"
                 style={{ color: "var(--text-muted)" }}
               >
-                remove
+                Delete
               </button>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="text-[11px] italic opacity-60 transition-opacity group-hover:opacity-100"
+            className="text-[11px] italic opacity-60 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
             style={{ color: "var(--text-muted)" }}
           >
             No Label
@@ -101,6 +100,20 @@ export function ListenerCard({ item, onSetLabel, onRemoveLabel }: Props) {
           PID: {item.listener.pid ?? "-"}
         </span>
       </div>
+
+      {showRemoveConfirm && (
+        <ConfirmDialog
+          title="Delete Label"
+          message={`Remove label "${item.label?.name}" from port ${item.listener.port}?`}
+          confirmLabel="Delete"
+          danger
+          onConfirm={() => {
+            onRemoveLabel("Port", String(item.listener.port));
+            setShowRemoveConfirm(false);
+          }}
+          onCancel={() => setShowRemoveConfirm(false)}
+        />
+      )}
     </div>
   );
 }

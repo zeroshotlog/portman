@@ -133,8 +133,51 @@ function App() {
           <div className="min-h-0 flex-1 overflow-auto">
             {tab === "ports" ? (
               loading && listeners.length === 0 ? (
-                <div className="flex h-full items-center justify-center">
-                  <span className="text-sm" style={{ color: "var(--text-muted)" }}>Scanning ports...</span>
+                <div className="flex h-full items-center justify-center" aria-live="polite">
+                  <div className="flex items-center gap-3">
+                    <svg
+                      aria-hidden="true"
+                      className="h-5 w-5 animate-spin"
+                      style={{ color: "var(--text-muted)" }}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    <span className="text-sm" style={{ color: "var(--text-muted)" }}>Scanning ports...</span>
+                  </div>
+                </div>
+              ) : processed.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center gap-3">
+                  <svg
+                    aria-hidden="true"
+                    className="h-12 w-12"
+                    style={{ color: "var(--text-muted)", opacity: 0.5 }}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+                    {searchQuery ? "No matching ports found" : "No active ports detected"}
+                  </span>
                 </div>
               ) : viewMode === "list" ? (
                 <ListenerTable

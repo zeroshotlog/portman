@@ -13,25 +13,18 @@ export function StatusBar({ scanTimeMs, error }: Props) {
       }}
     >
       <div className="flex items-center gap-2">
-        {error ? (
+        {error && (
           <>
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--danger)" }} />
-            <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
-              Error
-            </span>
-          </>
-        ) : (
-          <>
-            <span className="h-2 w-2 animate-pulse rounded-full" style={{ backgroundColor: "var(--success)" }} />
-            <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "var(--text-label)" }}>
-              Engine Active
+            <span className="text-[10px] font-medium" style={{ color: "var(--danger)" }}>
+              {error}
             </span>
           </>
         )}
       </div>
       {scanTimeMs !== null && (
         <span className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>
-          SCAN COMPLETE: {(scanTimeMs / 1000).toFixed(2)}s
+          Scanned in {(scanTimeMs / 1000).toFixed(2)}s
         </span>
       )}
     </footer>
