@@ -8,7 +8,7 @@ Yes! Portman is free and open source under the MIT license.
 
 ### Does it work on Intel Macs?
 
-Currently, the desktop app is built for Apple Silicon (M1/M2/M3) only. The MCP server works on both Intel and Apple Silicon.
+Currently, the desktop app is built for Apple Silicon only. The MCP server works on both Intel and Apple Silicon.
 
 ### Is my data sent anywhere?
 
