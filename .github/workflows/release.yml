@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: cd desktop && npm ci
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: crates/portman_desktop
+          tauriScript: cargo tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: "Portman ${{ github.ref_name }}"
+          releaseBody: |
+            ## Installation
+
+            1. Download the `.dmg` file below
+            2. Open the DMG and drag Portman to Applications
+            3. First launch: Right-click → Open (macOS Gatekeeper bypass)
+
+            ## Requirements
+
+            - macOS 11.0 or later
+            - Apple Silicon (aarch64)
+          releaseDraft: true
+          prerelease: false
+          args: "--bundles dmg"

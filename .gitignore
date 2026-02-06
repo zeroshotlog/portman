@@ -5,3 +5,9 @@ target/
 .DS_Store
 .vscode/
 npm/binaries/
+
+# Secrets
+.env
+.env.*
+*.pem
+*.p12
