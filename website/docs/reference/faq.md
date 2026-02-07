@@ -4,7 +4,7 @@
 
 ### Is Portman free?
 
-Yes! Portman is free and open source under the MIT license.
+Yes! Portman is currently free during the beta period.
 
 ### Does it work on Intel Macs?
 

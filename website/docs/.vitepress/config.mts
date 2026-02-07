@@ -52,13 +52,9 @@ export default defineConfig({
       }
     ],
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/zeroshotlog/portman' }
-    ],
-
     footer: {
-      message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2026 zeroshotlog'
+      message: 'Free during beta.',
+      copyright: '© 2026 zeroshotlog'
     }
   }
 })
