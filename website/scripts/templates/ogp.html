@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      position: relative;
+    }
+
+    .gradient-overlay {
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .title-group {
+      flex: 1;
+    }
+
+    .app-name {
+      font-size: 56px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .tagline {
+      font-size: 32px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .content {
+      max-width: 900px;
+    }
+
+    .description {
+      font-size: 28px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .features {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: #3b82f6;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .feature-text {
+      font-size: 20px;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 999px;
+      color: #60a5fa;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      background: #60a5fa;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .platform {
+      font-size: 20px;
+      color: #64748b;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="gradient-overlay"></div>
+  <div class="container">
+    <div class="header">
+      <img src="{{ICON_URL}}" alt="Portman Icon" class="icon">
+      <div class="title-group">
+        <div class="app-name">Portman</div>
+        <div class="tagline">Master Your Local Ports</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="description">
+        macOS port management tool for developers. Visualize TCP listeners, label services, and integrate with AI via MCP.
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">Real-time Scanning</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🏷️</div>
+          <div class="feature-text">Label Management</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-text">AI Integration</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="badge">
+        <div class="pulse"></div>
+        MCP Ready
+      </div>
+      <div class="platform">macOS 11.0+</div>
+    </div>
+  </div>
+</body>
+</html>

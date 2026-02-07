@@ -6,13 +6,17 @@
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "generate:banners": "node scripts/generate-banners.mjs",
+    "generate:ogp": "node scripts/generate-banners.mjs --ogp",
+    "generate:twitter": "node scripts/generate-banners.mjs --twitter"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "puppeteer": "^24.37.2",
     "vitepress": "^1.6.4"
   }
 }
