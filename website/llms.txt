@@ -1,0 +1,39 @@
+# Portman
+
+> Portman is a macOS-native port management tool for developers. It visualizes active TCP listeners, enables custom labeling, and integrates with AI assistants via MCP (Model Context Protocol).
+
+## Main Pages
+
+- [Home](https://zeroshotlog.github.io/portman/): Product landing page with feature overview and download links
+- [Getting Started](https://zeroshotlog.github.io/portman/docs/guide/getting-started): Quick start guide for desktop app and MCP server
+- [What is Portman?](https://zeroshotlog.github.io/portman/docs/guide/what-is-portman): Overview of the problem Portman solves and its key features
+
+## Features
+
+- [Active Ports](https://zeroshotlog.github.io/portman/docs/guide/active-ports): Real-time port scanning and process detection
+- [Find Free Ports](https://zeroshotlog.github.io/portman/docs/guide/find-free): Discover available ports in a specified range
+- [Labels](https://zeroshotlog.github.io/portman/docs/guide/labels): Assign custom names to ports, PIDs, or command patterns
+
+## AI Integration (MCP)
+
+- [MCP Setup](https://zeroshotlog.github.io/portman/docs/mcp/setup): Configure Portman MCP with Claude Desktop, Claude Code, or Antigravity
+- [MCP Tools](https://zeroshotlog.github.io/portman/docs/mcp/tools): Available MCP tools: scan_listeners, who, ports_find, label_set, etc.
+
+## Reference
+
+- [FAQ](https://zeroshotlog.github.io/portman/docs/reference/faq): Frequently asked questions about Portman
+- [Troubleshooting](https://zeroshotlog.github.io/portman/docs/reference/troubleshooting): Common issues and solutions
+
+## Downloads & Resources
+
+- [GitHub Releases](https://github.com/zeroshotlog/portman/releases): Download the desktop app (DMG for macOS)
+- [npm Package](https://www.npmjs.com/package/portman-mcp): MCP server package (MIT licensed)
+
+---
+
+## Quick Facts
+
+- **Platform**: macOS 11.0+ (Big Sur and later), Apple Silicon native
+- **Components**: Desktop App (Proprietary EULA), MCP Server (MIT License)
+- **Data Storage**: Local SQLite database at ~/.local/share/portman/labels.sqlite
+- **No telemetry**: All data stays on your machine

@@ -4,7 +4,91 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Portman - Master Your Local Ports</title>
+    <meta name="description" content="Portman is a macOS port management tool for developers. Visualize active TCP listeners, label services, and integrate with AI assistants via MCP (Model Context Protocol).">
+    <link rel="canonical" href="https://zeroshotlog.github.io/portman/">
     <link rel="icon" type="image/png" href="assets/icon.png"/>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Portman - Master Your Local Ports">
+    <meta property="og:description" content="The ultimate macOS port management tool. Visualize listeners, label services, and expose your environment to AI agents via MCP.">
+    <meta property="og:image" content="https://zeroshotlog.github.io/portman/assets/screenshot.png">
+    <meta property="og:url" content="https://zeroshotlog.github.io/portman/">
+    <meta property="og:site_name" content="Portman">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portman - Master Your Local Ports">
+    <meta name="twitter:description" content="macOS port management tool with AI integration via MCP.">
+    <meta name="twitter:image" content="https://zeroshotlog.github.io/portman/assets/screenshot.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Portman",
+        "description": "A macOS-native port management tool that visualizes active TCP listeners, enables custom labeling, and integrates with AI assistants via MCP (Model Context Protocol).",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS 11.0+",
+        "url": "https://zeroshotlog.github.io/portman/",
+        "downloadUrl": "https://github.com/zeroshotlog/portman/releases",
+        "softwareVersion": "0.1.0-beta",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "description": "Free during beta"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "zeroshotlog",
+            "url": "https://github.com/zeroshotlog"
+        },
+        "featureList": [
+            "Real-time port scanning",
+            "Process detection (Node, Python, Docker)",
+            "Custom label management",
+            "Find free ports",
+            "MCP server for AI integration",
+            "Native dark mode"
+        ],
+        "screenshot": "https://zeroshotlog.github.io/portman/assets/screenshot.png",
+        "softwareRequirements": "macOS 11.0+ (Big Sur), Apple Silicon"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Portman?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Portman is a macOS-native port management tool for developers. It visualizes all active TCP port listeners, lets you assign custom labels to services, and integrates with AI assistants like Claude via MCP (Model Context Protocol)."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Portman free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Portman is free during the beta period. The desktop app uses a Proprietary EULA, while the MCP server (portman-mcp) is MIT licensed."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I connect Portman to Claude?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "For Claude Code, run: claude mcp add portman -- npx portman-mcp. For Claude Desktop, add portman-mcp to your claude_desktop_config.json file."
+                }
+            }
+        ]
+    }
+    </script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
