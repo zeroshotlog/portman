@@ -5,7 +5,14 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "shell:allow-open",
+    {
+      "identifier": "shell:allow-open",
+      "allow": [
+        { "url": "^https?://localhost(:\\d+)?(/.*)?$" },
+        { "url": "^https?://127\\.0\\.0\\.1(:\\d+)?(/.*)?$" },
+        { "url": "^https://github\\.com/zeroshotlog/portman.*$" }
+      ]
+    },
     "core:window:allow-start-dragging",
     "core:menu:default",
     "core:image:default"
