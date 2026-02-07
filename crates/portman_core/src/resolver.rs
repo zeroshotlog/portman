@@ -1,5 +1,8 @@
 use crate::models::{LiveListener, Label, EnrichedListener, LabelKeyType};
-use regex::Regex;
+use regex::RegexBuilder;
+
+/// Maximum regex size to prevent ReDoS attacks
+const REGEX_SIZE_LIMIT: usize = 10 * 1024; // 10KB
 
 pub fn resolve_enrichment(listeners: Vec<LiveListener>, labels: Vec<Label>) -> Vec<EnrichedListener> {
     // Separate labels by type for efficiency
@@ -20,7 +23,10 @@ pub fn resolve_enrichment(listeners: Vec<LiveListener>, labels: Vec<Label>) -> V
                 }
             },
             LabelKeyType::Pattern => {
-                if let Ok(re) = Regex::new(&label.key_value) {
+                if let Ok(re) = RegexBuilder::new(&label.key_value)
+                    .size_limit(REGEX_SIZE_LIMIT)
+                    .build()
+                {
                     pattern_labels.push((re, label));
                 }
             }
