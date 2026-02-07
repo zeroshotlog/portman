@@ -127,22 +127,25 @@
         body {
             -webkit-font-smoothing: antialiased;
         }
-        .toast {
-            transform: translateY(100%);
+        .copy-btn .tooltip {
             opacity: 0;
-            transition: all 0.3s ease;
+            visibility: hidden;
+            transition: opacity 0.2s;
         }
-        .toast.show {
-            transform: translateY(0);
+        .copy-btn.copied .tooltip {
             opacity: 1;
+            visibility: visible;
         }
+        .copy-btn .icon-copy { display: inline; }
+        .copy-btn .icon-check { display: none; }
+        .copy-btn.copied .icon-copy { display: none; }
+        .copy-btn.copied .icon-check { display: inline; }
     </style>
     <script>
-        function copyToClipboard(text) {
+        function copyToClipboard(btn, text) {
             navigator.clipboard.writeText(text);
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
+            btn.classList.add('copied');
+            setTimeout(() => btn.classList.remove('copied'), 2000);
         }
     </script>
 </head>
@@ -195,8 +198,10 @@
                 <div class="w-full sm:w-auto flex items-center gap-2 bg-slate-100 dark:bg-surface-dark border border-slate-200 dark:border-border-dark px-6 py-4 rounded-xl font-mono text-sm group">
                     <span class="text-slate-500 dark:text-slate-500">$</span>
                     <span class="text-slate-800 dark:text-slate-200">brew install zeroshotlog/tap/portman</span>
-                    <button onclick="copyToClipboard('brew install --cask zeroshotlog/tap/portman')" class="ml-2 text-slate-400 hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined text-base">content_copy</span>
+                    <button onclick="copyToClipboard(this, 'brew install --cask zeroshotlog/tap/portman')" class="copy-btn relative ml-2 text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-base icon-copy">content_copy</span>
+                        <span class="material-symbols-outlined text-base icon-check text-emerald-500">check</span>
+                        <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-slate-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">Copied!</span>
                     </button>
                 </div>
             </div>
@@ -297,14 +302,22 @@
                         <div class="rounded-lg bg-black p-4 font-mono text-sm">
                             <div class="flex justify-between items-center mb-2 text-slate-500 text-xs uppercase font-bold tracking-widest">
                                 <span>Claude Code</span>
-                                <button onclick="copyToClipboard('claude mcp add portman -- npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
+                                <button onclick="copyToClipboard(this, 'claude mcp add portman -- npx portman-mcp')" class="copy-btn relative hover:text-white transition-colors cursor-pointer">
+                                    <span class="material-symbols-outlined text-base icon-copy">content_copy</span>
+                                    <span class="material-symbols-outlined text-base icon-check text-emerald-400">check</span>
+                                    <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">Copied!</span>
+                                </button>
                             </div>
                             <code class="text-slate-300">claude mcp add portman -- npx portman-mcp</code>
                         </div>
                         <div class="rounded-lg bg-black p-4 font-mono text-sm">
                             <div class="flex justify-between items-center mb-2 text-slate-500 text-xs uppercase font-bold tracking-widest">
                                 <span>Claude Desktop</span>
-                                <button onclick="copyToClipboard('npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
+                                <button onclick="copyToClipboard(this, 'npx portman-mcp')" class="copy-btn relative hover:text-white transition-colors cursor-pointer">
+                                    <span class="material-symbols-outlined text-base icon-copy">content_copy</span>
+                                    <span class="material-symbols-outlined text-base icon-check text-emerald-400">check</span>
+                                    <span class="tooltip absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">Copied!</span>
+                                </button>
                             </div>
                             <code class="text-slate-300">npx portman-mcp</code>
                         </div>
@@ -317,12 +330,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Toast -->
-    <div id="toast" class="toast fixed bottom-6 right-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-medium shadow-lg flex items-center gap-2 z-50">
-        <span class="material-symbols-outlined text-base text-emerald-400 dark:text-emerald-600">check_circle</span>
-        Copied to clipboard
-    </div>
 
     <!-- Footer -->
     <footer class="py-10 border-t border-slate-200 dark:border-border-dark">
