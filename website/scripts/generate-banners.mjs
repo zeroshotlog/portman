@@ -24,6 +24,14 @@ const BANNER_CONFIGS = {
     deviceScaleFactor: 2,
     description: 'Twitter Card (1200x600)',
   },
+  readme: {
+    template: 'readme.html',
+    width: 1280,
+    height: 640,
+    output: 'readme-banner.png',
+    deviceScaleFactor: 2,
+    description: 'README Banner (1280x640)',
+  },
 };
 
 /**
@@ -144,6 +152,7 @@ async function main() {
   } else {
     if (args.includes('--ogp')) typesToGenerate.push('ogp');
     if (args.includes('--twitter')) typesToGenerate.push('twitter');
+    if (args.includes('--readme')) typesToGenerate.push('readme');
   }
 
   if (typesToGenerate.length === 0) {
@@ -152,6 +161,7 @@ async function main() {
     console.log('  npm run generate:banners -- --all # Generate all banners');
     console.log('  npm run generate:banners -- --ogp # Generate OGP only');
     console.log('  npm run generate:banners -- --twitter # Generate Twitter Card only');
+    console.log('  npm run generate:banners -- --readme # Generate README banner only');
     process.exit(0);
   }
 

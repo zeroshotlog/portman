@@ -9,7 +9,8 @@
     "docs:preview": "vitepress preview docs",
     "generate:banners": "node scripts/generate-banners.mjs",
     "generate:ogp": "node scripts/generate-banners.mjs --ogp",
-    "generate:twitter": "node scripts/generate-banners.mjs --twitter"
+    "generate:twitter": "node scripts/generate-banners.mjs --twitter",
+    "generate:readme": "node scripts/generate-banners.mjs --readme"
   },
   "keywords": [],
   "author": "",

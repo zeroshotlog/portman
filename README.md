@@ -1,5 +1,7 @@
 # Portman
 
+![Portman Banner](website/assets/readme-banner.png)
+
 [![npm](https://img.shields.io/npm/v/portman-mcp.svg)](https://www.npmjs.com/package/portman-mcp)
 
 Portmanは、macOS向けのローカルポート使用状況の可視化・管理ツールです。
