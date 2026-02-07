@@ -35,7 +35,7 @@
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "macOS 11.0+",
         "url": "https://zeroshotlog.github.io/portman/",
-        "downloadUrl": "https://github.com/zeroshotlog/portman/releases/download/v0.1.0/Portman_0.1.0_aarch64.dmg/download/v0.1.0/Portman_0.1.0_aarch64.dmg",
+        "downloadUrl": "https://github.com/zeroshotlog/portman/releases/download/v0.1.0/Portman_0.1.0_aarch64.dmg",
         "softwareVersion": "0.1.0",
         "offers": {
             "@type": "Offer",
@@ -127,7 +127,24 @@
         body {
             -webkit-font-smoothing: antialiased;
         }
+        .toast {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans selection:bg-primary selection:text-white">
     <!-- Navigation -->
@@ -178,7 +195,7 @@
                 <div class="w-full sm:w-auto flex items-center gap-2 bg-slate-100 dark:bg-surface-dark border border-slate-200 dark:border-border-dark px-6 py-4 rounded-xl font-mono text-sm group">
                     <span class="text-slate-500 dark:text-slate-500">$</span>
                     <span class="text-slate-800 dark:text-slate-200">brew install zeroshotlog/tap/portman</span>
-                    <button onclick="navigator.clipboard.writeText('brew install --cask zeroshotlog/tap/portman')" class="ml-2 text-slate-400 hover:text-primary transition-colors">
+                    <button onclick="copyToClipboard('brew install --cask zeroshotlog/tap/portman')" class="ml-2 text-slate-400 hover:text-primary transition-colors">
                         <span class="material-symbols-outlined text-base">content_copy</span>
                     </button>
                 </div>
@@ -280,14 +297,14 @@
                         <div class="rounded-lg bg-black p-4 font-mono text-sm">
                             <div class="flex justify-between items-center mb-2 text-slate-500 text-xs uppercase font-bold tracking-widest">
                                 <span>Claude Code</span>
-                                <button onclick="navigator.clipboard.writeText('claude mcp add portman -- npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
+                                <button onclick="copyToClipboard('claude mcp add portman -- npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
                             </div>
                             <code class="text-slate-300">claude mcp add portman -- npx portman-mcp</code>
                         </div>
                         <div class="rounded-lg bg-black p-4 font-mono text-sm">
                             <div class="flex justify-between items-center mb-2 text-slate-500 text-xs uppercase font-bold tracking-widest">
                                 <span>Claude Desktop</span>
-                                <button onclick="navigator.clipboard.writeText('npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
+                                <button onclick="copyToClipboard('npx portman-mcp')" class="material-symbols-outlined text-base hover:text-white transition-colors cursor-pointer">content_copy</button>
                             </div>
                             <code class="text-slate-300">npx portman-mcp</code>
                         </div>
@@ -300,6 +317,12 @@
             </div>
         </div>
     </section>
+
+    <!-- Toast -->
+    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-sm font-medium shadow-lg flex items-center gap-2 z-50">
+        <span class="material-symbols-outlined text-base text-emerald-400 dark:text-emerald-600">check_circle</span>
+        Copied to clipboard
+    </div>
 
     <!-- Footer -->
     <footer class="py-10 border-t border-slate-200 dark:border-border-dark">
