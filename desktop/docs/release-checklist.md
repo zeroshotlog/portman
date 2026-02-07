@@ -1,341 +1,273 @@
-# Portman v0.1.0 リリース手順書
+# Portman リリース手順書
 
-初回リリースのためのステップバイステップガイド。
-
----
-
-## Phase 1: リポジトリ公開準備
-
-### 1.1 機密情報チェック
-
-```bash
-# コミット履歴に機密情報がないか確認
-git log --all -p | grep -iE "secret|password|token|api_key|credential" | head -50
-```
-
-- [ ] 機密情報が含まれていないことを確認
-
-### 1.2 必要ファイルの追加
-
-- [ ] LICENSE ファイル作成
-
-```bash
-# MIT License を追加
-cat > LICENSE << 'EOF'
-MIT License
-
-Copyright (c) 2026 zeroshotlog
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-EOF
-```
-
-- [ ] README.md を公開向けに整備（必要に応じて英語併記）
-
-### 1.3 .gitignore 確認
-
-```bash
-cat .gitignore | grep -E "\.env|credential|secret"
-```
-
-- [ ] `.env`, 機密ファイルが除外されていることを確認
+バイナリ配布モデル: ソースコードは非公開、ビルド済みDMGのみ配布。
 
 ---
 
-## Phase 2: GitHub Organization 作成
+## リポジトリ構成
 
-### 2.1 Organization 作成
-
-1. https://github.com/organizations/plan にアクセス
-2. **Create a free organization** を選択
-3. Organization name を入力（例: `portman-app`）
-4. 作成完了
-
-- [ ] Organization 作成完了
-- [ ] Organization名: _______________
-
-### 2.2 リポジトリ移譲
-
-**方法A: 既存リポジトリを移譲（推奨）**
-
-1. https://github.com/wizteriacode/portman/settings に移動
-2. 一番下の **Danger Zone** → **Transfer ownership**
-3. 移譲先 Organization を選択
-4. リポジトリ名を入力して確認
-
-```bash
-# 移譲後、リモートURLを更新
-git remote set-url origin git@github.com:NEW_ORG/portman.git
-```
-
-- [ ] リポジトリ移譲完了
-- [ ] リモートURL更新完了
-
-**方法B: 新規作成（履歴を整理したい場合）**
-
-```bash
-git remote add public git@github.com:NEW_ORG/portman.git
-git push public master
-```
-
-### 2.3 リポジトリを Public に変更
-
-1. Settings → General → Danger Zone
-2. **Change repository visibility** → Make public
-
-- [ ] リポジトリを Public に変更完了
+| リポジトリ | 公開設定 | 用途 |
+|-----------|---------|------|
+| `wizteriacode/portman` | Private | 開発・ソースコード管理 |
+| `zeroshotlog/portman` | Public | リリース配布（README + DMG） |
 
 ---
 
-## Phase 3: GitHub Actions 設定
+## 初回セットアップ（1回のみ）
 
-### 3.1 ワークフローファイル作成
+### Step 1: 公開リポジトリ作成
+
+1. https://github.com/orgs/zeroshotlog/repositories にアクセス
+2. **New repository** をクリック
+3. 設定:
+   - Repository name: `portman`
+   - Description: `Local port management tool for macOS`
+   - Public を選択
+   - **Add a README file** にチェック
+4. **Create repository** をクリック
+
+- [ ] 公開リポジトリ作成完了
+
+### Step 2: 公開用READMEを作成
+
+GitHub Web UI で `zeroshotlog/portman` の README.md を編集:
+
+```markdown
+# Portman
+
+macOS向けローカルポート管理ツール。
+
+## Features
+
+- アクティブなポートをリアルタイムスキャン
+- ポートにラベル・メモを付けて管理
+- プロセス名・タイプの自動検出
+- 空きポートの検索
+
+## Requirements
+
+- macOS 11.0 (Big Sur) 以降
+- Apple Silicon native
+
+## Installation
+
+### Download
+
+[Releases](https://github.com/zeroshotlog/portman/releases) から最新の `.dmg` をダウンロード。
+
+### Install
+
+1. DMGファイルを開く
+2. Portman.app を Applications フォルダにドラッグ
+3. 初回起動時: Portman.app を右クリック → 「開く」を選択
+
+> 署名されていないアプリのため、初回は Gatekeeper の警告が表示されます。
+
+## Screenshots
+
+(後で追加)
+```
+
+- [ ] README.md 作成完了
+
+### Step 3: ローカルにクローン
 
 ```bash
-mkdir -p .github/workflows
+git clone git@github.com:zeroshotlog/portman.git ~/portman-release
 ```
 
-`.github/workflows/release.yml` を作成:
-
-```yaml
-name: Release
-
-on:
-  push:
-    tags:
-      - "v*"
-
-jobs:
-  build-macos:
-    runs-on: macos-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install frontend dependencies
-        run: cd desktop && npm ci
-
-      - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: crates/portman_desktop
-          tauriScript: cargo tauri
-          tagName: ${{ github.ref_name }}
-          releaseName: "Portman ${{ github.ref_name }}"
-          releaseBody: |
-            ## What's New
-
-            See [CHANGELOG](https://github.com/ORG_NAME/portman/blob/master/CHANGELOG.md) for details.
-
-            ## Installation
-
-            1. Download the `.dmg` file below
-            2. Open the DMG and drag Portman to Applications
-            3. First launch: Right-click → Open (macOS Gatekeeper)
-          releaseDraft: true
-          prerelease: false
-          args: "--bundles dmg"
-```
-
-- [ ] `.github/workflows/release.yml` 作成完了
-- [ ] `ORG_NAME` を実際の Organization 名に置換
-
-### 3.2 ワークフローをコミット & プッシュ
-
-```bash
-git add .github/workflows/release.yml
-git commit -m "GitHub Actions リリースワークフローを追加"
-git push origin master
-```
-
-- [ ] ワークフローをプッシュ完了
+- [ ] クローン完了
 
 ---
 
-## Phase 4: 初回リリース実行
+## リリース手順（毎回）
 
-### 4.1 最終確認
+### Step 1: バージョン更新
+
+開発リポジトリでバージョンを更新:
 
 ```bash
-# ビルドが通ることを確認
 cd /Users/reverseblade/personal/portman
-cargo build --release -p portman-desktop
 
-# フロントエンドビルド確認
-cd desktop && npm run build
+# tauri.conf.json のバージョンを更新
+# "version": "0.1.0" → "0.2.0" など
+code crates/portman_desktop/tauri.conf.json
 ```
 
-- [ ] Rust ビルド成功
-- [ ] フロントエンドビルド成功
-
-### 4.2 バージョン確認
-
-現在のバージョン: `crates/portman_desktop/tauri.conf.json`
-
-```json
-"version": "0.1.0"
+現在のバージョン確認:
+```bash
+grep '"version"' crates/portman_desktop/tauri.conf.json
 ```
 
-- [ ] バージョン番号確認: `0.1.0`
+- [ ] バージョン更新完了
+- [ ] 更新後バージョン: _______________
 
-### 4.3 タグ作成 & プッシュ
+### Step 2: DMGビルド
 
 ```bash
-# タグ作成
-git tag v0.1.0
+cd /Users/reverseblade/personal/portman
 
-# タグをプッシュ（これで GitHub Actions が起動）
-git push origin v0.1.0
+# フロントエンドの依存関係を最新化
+cd desktop && npm ci && cd ..
+
+# リリースビルド
+cargo tauri build --bundles dmg
 ```
 
-- [ ] タグ作成完了
-- [ ] タグプッシュ完了
+ビルド成果物の場所:
+```
+target/release/bundle/dmg/Portman_X.X.X_aarch64.dmg
+```
 
-### 4.4 GitHub Actions 監視
+- [ ] ビルド成功
+- [ ] DMGファイル確認: `ls -la target/release/bundle/dmg/`
 
-1. https://github.com/ORG_NAME/portman/actions にアクセス
-2. ワークフローの実行状況を確認（約5-10分）
+### Step 3: 動作確認
 
-- [ ] GitHub Actions 実行成功
+```bash
+# DMGをマウントしてテスト
+open target/release/bundle/dmg/Portman_*.dmg
+```
 
-### 4.5 Release 公開
+確認項目:
+- [ ] アプリが起動する
+- [ ] ポートスキャンが動作する
+- [ ] ラベル追加・削除が動作する
+- [ ] ダークモード切り替えが動作する
 
-1. https://github.com/ORG_NAME/portman/releases にアクセス
-2. Draft release が作成されていることを確認
-3. リリースノートを確認・編集
+### Step 4: GitHub Release 作成
+
+**方法A: GitHub Web UI（推奨）**
+
+1. https://github.com/zeroshotlog/portman/releases にアクセス
+2. **Draft a new release** をクリック
+3. 設定:
+   - **Choose a tag**: `v0.1.0` を入力 → **Create new tag**
+   - **Release title**: `Portman v0.1.0`
+   - **Description**:
+     ```
+     ## What's New
+
+     - 初回リリース
+     - ポートスキャン・ラベル管理機能
+     - ダークモード対応
+
+     ## Installation
+
+     1. 下の `.dmg` ファイルをダウンロード
+     2. DMGを開いて Portman.app を Applications にドラッグ
+     3. 初回起動: 右クリック → 開く
+     ```
+   - **Attach binaries**: DMGファイルをドラッグ&ドロップ
 4. **Publish release** をクリック
 
-- [ ] Release 公開完了
-- [ ] DMG ダウンロード可能を確認
+**方法B: gh CLI**
+
+```bash
+# DMGファイルのパスを変数に
+DMG_FILE=$(ls target/release/bundle/dmg/Portman_*.dmg)
+VERSION="0.1.0"
+
+# リリースリポジトリに移動
+cd ~/portman-release
+
+# タグ作成（軽量タグ）
+git tag "v${VERSION}"
+git push origin "v${VERSION}"
+
+# リリース作成 & DMGアップロード
+gh release create "v${VERSION}" \
+  --title "Portman v${VERSION}" \
+  --notes "## What's New
+
+- 初回リリース
+
+## Installation
+
+1. 下の .dmg ファイルをダウンロード
+2. DMGを開いて Portman.app を Applications にドラッグ
+3. 初回起動: 右クリック → 開く" \
+  "/Users/reverseblade/personal/portman/${DMG_FILE}"
+```
+
+- [ ] Release 作成完了
+- [ ] DMGダウンロード可能を確認
+
+### Step 5: 開発リポジトリにタグ
+
+開発リポジトリにもタグを付けて同期:
+
+```bash
+cd /Users/reverseblade/personal/portman
+git add -A
+git commit -m "v0.1.0"
+git tag v0.1.0
+git push origin master --tags
+```
+
+- [ ] 開発リポジトリにタグ付け完了
 
 ---
 
-## Phase 5: 動作確認
+## リリース後の確認
 
-### 5.1 DMG インストールテスト
+### ダウンロードテスト
 
 ```bash
-# DMG をダウンロード
-cd ~/Downloads
+# 公開URLからダウンロード
+curl -LO https://github.com/zeroshotlog/portman/releases/download/v0.1.0/Portman_0.1.0_aarch64.dmg
+
+# インストールテスト
 open Portman_0.1.0_aarch64.dmg
-
-# アプリを Applications にドラッグ
-# 初回起動: 右クリック → 開く
 ```
 
-- [ ] DMG からインストール成功
-- [ ] アプリ起動成功
-- [ ] 基本機能動作確認（ポートスキャン、ラベル付け）
+- [ ] 公開URLからダウンロード可能
+- [ ] インストール・起動成功
 
 ---
 
-## Phase 6: Homebrew Cask（任意）
+## クイックリファレンス
 
-### 6.1 tap リポジトリ作成
-
-1. Organization に `homebrew-portman` リポジトリを作成
-2. `Casks/portman.rb` を作成
+### ビルドコマンド
 
 ```bash
-# DMG の SHA256 を取得
-shasum -a 256 ~/Downloads/Portman_0.1.0_aarch64.dmg
+cd /Users/reverseblade/personal/portman
+cargo tauri build --bundles dmg
 ```
 
-`Casks/portman.rb`:
+### DMGの場所
 
-```ruby
-cask "portman" do
-  version "0.1.0"
-  sha256 "SHA256_HASH_HERE"
-
-  url "https://github.com/ORG_NAME/portman/releases/download/v#{version}/Portman_#{version}_aarch64.dmg"
-  name "Portman"
-  desc "Local port management tool for macOS"
-  homepage "https://github.com/ORG_NAME/portman"
-
-  app "Portman.app"
-
-  zap trash: [
-    "~/.local/share/portman",
-  ]
-end
+```
+target/release/bundle/dmg/Portman_X.X.X_aarch64.dmg
 ```
 
-- [ ] homebrew-portman リポジトリ作成
-- [ ] Cask 定義ファイル作成
+### リリースURL
 
-### 6.2 インストールテスト
-
-```bash
-brew tap ORG_NAME/portman
-brew install --cask portman
 ```
-
-- [ ] Homebrew からインストール成功
-
----
-
-## 完了チェックリスト
-
-| Phase | 項目 | 状態 |
-|-------|------|------|
-| 1 | 機密情報チェック | ⬜ |
-| 1 | LICENSE 追加 | ⬜ |
-| 2 | Organization 作成 | ⬜ |
-| 2 | リポジトリ移譲 | ⬜ |
-| 2 | Public 化 | ⬜ |
-| 3 | GitHub Actions 設定 | ⬜ |
-| 4 | タグ作成 & プッシュ | ⬜ |
-| 4 | Release 公開 | ⬜ |
-| 5 | 動作確認 | ⬜ |
-| 6 | Homebrew Cask（任意） | ⬜ |
+https://github.com/zeroshotlog/portman/releases
+```
 
 ---
 
 ## トラブルシューティング
 
-### GitHub Actions が失敗する場合
+### ビルドエラー
 
 ```bash
-# ローカルでビルドテスト
+# キャッシュクリア
+cargo clean
+cd desktop && rm -rf node_modules && npm ci && cd ..
 cargo tauri build --bundles dmg
 ```
 
-### Gatekeeper 警告が出る場合
+### Gatekeeper 警告
 
-署名なしDMGは初回起動時に警告が出る。ユーザーへの案内:
-
+署名なしDMGは警告が出る。ユーザーへの案内:
 1. Finder でアプリを右クリック
 2. 「開く」を選択
 3. 確認ダイアログで「開く」をクリック
 
-### 将来: Apple 署名を追加する場合
+### 将来: Apple署名を追加
 
-`distribution-plan.md` の Phase 4 を参照。
+Apple Developer Program ($99/年) に登録後、署名と公証を追加可能。
+詳細は `distribution-plan.md` Phase 4 を参照。

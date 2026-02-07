@@ -18,7 +18,7 @@ macOS向けローカルポート管理ツール「Portman」のランディン�
 ### 配布形態
 - **デスクトップアプリ:** GitHub Releasesからの直接ダウンロード（DMG）
 - **MCP サーバー:** npm パッケージとして配布（AIエージェント連携用）
-- 無料・MIT License
+- Free (Beta) - Proprietary EULA
 
 ---
 
@@ -72,8 +72,8 @@ claude mcp add portman -- npx portman-mcp
 npm パッケージへのリンク: https://www.npmjs.com/package/portman-mcp
 
 ### フッター
-- GitHub リポジトリ
-- ライセンス（MIT）
+- npm パッケージへのリンク
+- © 2026 zeroshotlog
 
 ---
 
