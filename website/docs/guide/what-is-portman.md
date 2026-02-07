@@ -41,4 +41,4 @@ Portman comes in two flavors:
 1. **Desktop App** - A native macOS app with a beautiful UI
 2. **MCP Server** - Connect to Claude Desktop/Code for AI-powered port management
 
-Both are free and open source under the MIT license.
+The Desktop app is free during beta (Proprietary EULA). The MCP server is MIT licensed.

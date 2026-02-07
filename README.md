@@ -1,57 +1,61 @@
 # Portman
 
-[![crates.io](https://img.shields.io/crates/v/portman-mcp.svg)](https://crates.io/crates/portman-mcp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/portman-mcp.svg)](https://www.npmjs.com/package/portman-mcp)
 
-Portmanは、macOS向けのローカルポート使用状況の可視化・管理ツールです。CLIツールおよびMCP（Model Context Protocol）サーバーとして機能します。
+Portmanは、macOS向けのローカルポート使用状況の可視化・管理ツールです。
+デスクトップアプリ、CLIツール、およびMCP（Model Context Protocol）サーバーとして機能します。
+
 開発者が「どのポートが使用中か」を即座に把握し、ポート競合や開発環境の混乱を防ぐために作られました。
 
 ## 特徴
 
-- **リスナーのスキャン**: `lsof` を利用して現在LISTEN状態のTCPポートを一覧表示。
-- **インテリジェントな推論**: プロセス名やポート番号から、起動中のアプリ（Vite, Next.js, Python等）を推測。
-- **フリーポート検索**: 指定範囲内から安全に使える空きポートを検索・提案。
-- **永続ラベル**: ポート、PID、または起動コマンドのパターン（正規表現）にラベル（名前・メモ）を付与し、DBに保存。
-- **MCP対応**: Claude Code や Antigravity などのAIエージェントから直接ポート情報を取得・操作可能。
+- **リアルタイムスキャン**: `lsof` を利用して現在LISTEN状態のTCPポートを一覧表示
+- **インテリジェントな推論**: プロセス名やポート番号から、起動中のアプリ（Vite, Next.js, Python等）を推測
+- **フリーポート検索**: 指定範囲内から安全に使える空きポートを検索・提案
+- **永続ラベル**: ポート、PID、またはコマンドパターン（正規表現）にラベルを付与しDBに保存
+- **MCP対応**: Claude Code/Desktop などのAIエージェントから直接ポート情報を取得・操作可能
 
 ## 必須要件
 
-- macOS (Intel / Apple Silicon)
-- Rust (ビルド用)
+- macOS 11.0+ (Big Sur and later)
+- Apple Silicon native
+
+## コンポーネント構成
+
+| コンポーネント | 説明 | ライセンス |
+|---------------|------|-----------|
+| デスクトップアプリ | ネイティブGUIアプリ (Tauri) | Proprietary EULA |
+| portman-cli | CLIツール | Proprietary EULA |
+| portman-mcp | MCPサーバー (npm公開) | MIT |
 
 ## インストール
 
-### crates.io からインストール（推奨）
-```bash
-# MCPサーバー（AIエージェント連携用）
-cargo install portman-mcp
+### デスクトップアプリ（推奨）
 
-# CLIツール（MCPサーバーと一緒にインストールされるportman-coreに含まれる機能をCLIで使う場合）
-cargo install --path crates/portman_cli
+[GitHub Releases](https://github.com/zeroshotlog/portman/releases) からDMGをダウンロード。
+
+> **Note**: 現在未署名のため、初回起動時は右クリック→「開く」が必要です。
+
+### MCPサーバー（AIエージェント連携用）
+
+```bash
+npx portman-mcp
 ```
 
-### ソースからビルドしてインストール
-```bash
-# CLIツールのインストール
-cargo install --path crates/portman_cli
-
-# MCPサーバーのインストール（AIエージェント連携用）
-cargo install --path crates/portman_mcp
-```
-
-## ローカル開発での実行方法
-
-開発中にソースコードから直接実行する場合：
+### ソースからビルド（開発者向け）
 
 ```bash
-# スキャン実行
-cargo run -q -p portman_cli -- scan
+# 全体ビルド
+cargo build --workspace
 
-# 空きポート検索
-cargo run -q -p portman_cli -- ports find
-
-# テスト実行
+# テスト
 cargo test --workspace
+
+# CLIを直接実行
+cargo run -p portman_cli -- scan
+
+# デスクトップアプリをビルド
+cargo tauri build --bundles dmg
 ```
 
 ## CLI の使い方
@@ -137,7 +141,7 @@ claude mcp remove portman
 claude mcp add portman -- npx -y portman-mcp@latest
 ```
 
-Claude Desktop (`claude_desktop_config.json`) / Antigravity (`~/.gemini/antigravity/mcp_config.json`):
+Claude Desktop / Antigravity:
 
 ```json
 {
@@ -161,20 +165,11 @@ Claude Desktop (`claude_desktop_config.json`) / Antigravity (`~/.gemini/antigrav
 | `label_list` | ラベル一覧取得 |
 | `label_remove_*` | ラベル削除 |
 
-## crates.io への公開手順（メンテナ向け）
-
-依存関係があるため、以下の順序で公開してください：
-
-1. **portman-core** の公開（portman-mcpの依存先）
-   ```bash
-   cargo publish -p portman-core
-   ```
-
-2. **portman-mcp** の公開
-   ```bash
-   cargo publish -p portman-mcp
-   ```
-
 ## ライセンス
 
-MIT License
+- **デスクトップアプリ / CLI**: Proprietary EULA（[LICENSE](./LICENSE) 参照）
+- **portman-mcp**: MIT License
+
+---
+
+© 2026 zeroshotlog
