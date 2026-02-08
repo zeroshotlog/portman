@@ -8,7 +8,7 @@ mod macos {
     use objc2::runtime::{AnyClass, AnyObject};
     use objc2::{msg_send, AnyThread as _};
     use objc2::MainThreadMarker;
-    use objc2_app_kit::{NSApplication, NSImage};
+    use objc2_app_kit::{NSApplication, NSImage, NSAlert, NSAlertStyle};
     use objc2_foundation::{NSData, NSString};
 
     fn load_icon() -> Option<Retained<NSImage>> {
@@ -46,10 +46,67 @@ mod macos {
                 let _: () = msg_send![&dict, setObject: &*v, forKey: &*k];
             };
             set("ApplicationName", "Portman");
-            set("Version", "0.1.1");
+            set("Version", "0.1.2");
             set("Copyright", "Copyright 2026 zeroshotlog");
 
             let _: () = msg_send![&app, orderFrontStandardAboutPanelWithOptions: &*dict];
+        }
+    }
+
+    #[tauri::command]
+    pub fn show_update_dialog(latest_version: String, current_version: String) -> bool {
+        let Some(mtm) = MainThreadMarker::new() else { return false };
+
+        unsafe {
+            let alert = NSAlert::new(mtm);
+
+            // Set app icon
+            if let Some(icon) = load_icon() {
+                alert.setIcon(Some(&icon));
+            }
+
+            // Set alert style
+            alert.setAlertStyle(NSAlertStyle::Informational);
+
+            // Set message
+            alert.setMessageText(&NSString::from_str("Update Available"));
+            alert.setInformativeText(&NSString::from_str(&format!(
+                "A new version of Portman is available.\n\n\
+                 New version: v{}\n\
+                 Your version: v{}",
+                latest_version, current_version
+            )));
+
+            // Add buttons (first button is default, rightmost)
+            alert.addButtonWithTitle(&NSString::from_str("Download"));
+            alert.addButtonWithTitle(&NSString::from_str("Later"));
+
+            // Run modal and check result
+            let response = alert.runModal();
+            response == 1000 // NSAlertFirstButtonReturn
+        }
+    }
+
+    #[tauri::command]
+    pub fn show_up_to_date_dialog(current_version: String) {
+        let Some(mtm) = MainThreadMarker::new() else { return };
+
+        unsafe {
+            let alert = NSAlert::new(mtm);
+
+            if let Some(icon) = load_icon() {
+                alert.setIcon(Some(&icon));
+            }
+
+            alert.setAlertStyle(NSAlertStyle::Informational);
+            alert.setMessageText(&NSString::from_str("You're Up to Date"));
+            alert.setInformativeText(&NSString::from_str(&format!(
+                "Portman v{} is the latest version.",
+                current_version
+            )));
+
+            alert.addButtonWithTitle(&NSString::from_str("OK"));
+            alert.runModal();
         }
     }
 }
@@ -57,6 +114,7 @@ mod macos {
 fn main() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .setup(|_app| {
             #[cfg(target_os = "macos")]
@@ -71,6 +129,8 @@ fn main() {
             commands::set_label,
             commands::remove_label,
             macos::show_about,
+            macos::show_update_dialog,
+            macos::show_up_to_date_dialog,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

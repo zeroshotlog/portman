@@ -1,6 +1,6 @@
 [package]
 name = "portman-desktop"
-version = "0.1.1"
+version = "0.1.2"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -12,6 +12,7 @@ tauri-build = { version = "2", features = [] }
 portman-core = { path = "../portman_core" }
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
 tauri-plugin-window-state = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -19,5 +20,5 @@ chrono = { version = "0.4", features = ["serde"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
-objc2-app-kit = { version = "0.3", features = ["NSApplication", "NSImage"] }
+objc2-app-kit = { version = "0.3", features = ["NSApplication", "NSImage", "NSAlert", "NSButton"] }
 objc2-foundation = { version = "0.3", features = ["NSData"] }

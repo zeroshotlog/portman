@@ -5,6 +5,35 @@ import { CheckMenuItem } from "@tauri-apps/api/menu/checkMenuItem";
 import { Submenu } from "@tauri-apps/api/menu/submenu";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-shell";
+import { message } from "@tauri-apps/plugin-dialog";
+
+const CURRENT_VERSION = "0.1.2";
+const LANDING_PAGE = "https://zeroshotlog.github.io/portman/";
+const GITHUB_API = "https://api.github.com/repos/zeroshotlog/portman/releases/latest";
+
+async function checkForUpdates() {
+  try {
+    const response = await fetch(GITHUB_API);
+    if (!response.ok) throw new Error("Failed to fetch");
+
+    const release = await response.json();
+    const latestVersion = release.tag_name.replace(/^v/, "");
+
+    if (latestVersion !== CURRENT_VERSION) {
+      const shouldOpen = await invoke<boolean>("show_update_dialog", {
+        latestVersion,
+        currentVersion: CURRENT_VERSION,
+      });
+      if (shouldOpen) {
+        open(LANDING_PAGE);
+      }
+    } else {
+      await invoke("show_up_to_date_dialog", { currentVersion: CURRENT_VERSION });
+    }
+  } catch {
+    await message("Failed to check for updates. Please try again later.", { title: "Error", kind: "error" });
+  }
+}
 
 let lightCheck: CheckMenuItem;
 let darkCheck: CheckMenuItem;
@@ -90,6 +119,13 @@ export async function setupMenu() {
     id: "about",
     action: () => invoke("show_about"),
   });
+
+  const checkUpdatesItem = await MenuItem.new({
+    text: "Check for Updates\u2026",
+    id: "check-updates",
+    action: checkForUpdates,
+  });
+
   const sep = () => PredefinedMenuItem.new({ item: "Separator" });
 
   // === App menu ===
@@ -97,6 +133,7 @@ export async function setupMenu() {
     text: "Portman",
     items: [
       about,
+      checkUpdatesItem,
       await sep(),
       settingsItem,
       await sep(),
