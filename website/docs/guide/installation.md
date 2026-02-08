@@ -21,7 +21,17 @@ Since Portman is distributed without an Apple Developer signature, macOS Gatekee
 3. Select **Open** from the context menu
 4. Click **Open** in the security dialog
 
-### Method 2: System Settings
+### Method 2: Remove quarantine attribute (recommended for "damaged" error)
+
+If macOS shows **"Portman is damaged and can't be opened"** (common when downloaded via Chrome/Safari), run:
+
+```bash
+xattr -cr /Applications/Portman.app
+```
+
+Then open Portman normally.
+
+### Method 3: System Settings
 
 1. Try to open Portman normally (it will be blocked)
 2. Go to **System Settings** > **Privacy & Security**

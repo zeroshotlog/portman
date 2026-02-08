@@ -2,6 +2,21 @@
 
 ## Desktop App
 
+### "Portman is damaged and can't be opened"
+
+**Symptom:** macOS shows "Portman is damaged and can't be opened. You should eject the disk image."
+
+**Cause:** macOS quarantine attribute on unsigned apps downloaded from the internet.
+
+**Solution:**
+```bash
+xattr -cr /Applications/Portman.app
+```
+
+Then open Portman normally.
+
+---
+
 ### App won't open (security warning)
 
 **Symptom:** "Portman can't be opened because Apple cannot check it for malicious software"
@@ -60,7 +75,7 @@ claude mcp list
 
 2. Check JSON syntax in config file
 
-3. Ensure Node.js 16+ is installed:
+3. Ensure Node.js 18+ is installed:
 ```bash
 node --version
 ```
