@@ -10,7 +10,8 @@
       "allow": [
         { "url": "^https?://localhost(:\\d+)?(/.*)?$" },
         { "url": "^https?://127\\.0\\.0\\.1(:\\d+)?(/.*)?$" },
-        { "url": "^https://github\\.com/zeroshotlog/portman.*$" }
+        { "url": "^https://github\\.com/zeroshotlog/portman.*$" },
+        { "url": "^https://zeroshotlog\\.github\\.io/portman(/.*)?$" }
       ]
     },
     "core:window:allow-start-dragging",

@@ -46,7 +46,7 @@ mod macos {
                 let _: () = msg_send![&dict, setObject: &*v, forKey: &*k];
             };
             set("ApplicationName", "Portman");
-            set("Version", "0.1.0");
+            set("Version", "0.1.1");
             set("Copyright", "Copyright 2026 zeroshotlog");
 
             let _: () = msg_send![&app, orderFrontStandardAboutPanelWithOptions: &*dict];

@@ -54,7 +54,7 @@ export async function setupMenu() {
   const helpItem = await MenuItem.new({
     text: "Portman Help",
     id: "help",
-    action: () => open("https://github.com/zeroshotlog/portman"),
+    action: () => open("https://zeroshotlog.github.io/portman/docs/guide/getting-started.html"),
   });
 
   // === Appearance check items ===
