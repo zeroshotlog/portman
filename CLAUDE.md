@@ -44,3 +44,19 @@ macOS限定（`lsof`コマンドに依存）
 - コミットメッセージは日本語で書くこと
 - リリースノートは英語で書くこと
 - コミットメッセージに `Co-Authored-By` を付けないこと
+
+## デスクトップアプリ リリース手順
+
+詳細は `desktop/docs/release-checklist.md` 参照。
+
+### バージョン更新対象
+- `crates/portman_desktop/tauri.conf.json` — version
+- `crates/portman_desktop/Cargo.toml` — version
+- `website/index.html` — DMGリンク×4 + バージョン表示×2（計6箇所）
+
+### リリースフロー概要
+1. バージョン更新（上記3ファイル）
+2. `cargo tauri build --bundles dmg` でビルド & 動作確認
+3. コミット → origin/public にプッシュ → `gh release create` でRelease作成
+4. ランディングページ同期: `main`ブランチに手動同期（website/がルート直下に配置される構造）
+5. Homebrew tap更新: `zeroshotlog/homebrew-tap` の `Casks/portman.rb`（version + sha256）
