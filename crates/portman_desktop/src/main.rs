@@ -32,7 +32,7 @@ mod macos {
 
         // Build options dictionary with icon explicitly
         unsafe {
-            let dict_cls = AnyClass::get(c"NSMutableDictionary").unwrap();
+            let Some(dict_cls) = AnyClass::get(c"NSMutableDictionary") else { return };
             let dict: Retained<AnyObject> = msg_send![dict_cls, new];
 
             if let Some(icon) = load_icon() {
@@ -112,7 +112,15 @@ mod macos {
 }
 
 fn main() {
-    let app = tauri::Builder::default()
+    let portman = match portman_core::Portman::new() {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("Failed to initialize Portman: {}", e);
+            std::process::exit(1);
+        }
+    };
+    let app = match tauri::Builder::default()
+        .manage(std::sync::Mutex::new(portman))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
@@ -133,7 +141,13 @@ fn main() {
             macos::show_up_to_date_dialog,
         ])
         .build(tauri::generate_context!())
-        .expect("error while building tauri application");
+    {
+        Ok(app) => app,
+        Err(e) => {
+            eprintln!("Failed to build Tauri application: {}", e);
+            std::process::exit(1);
+        }
+    };
 
     app.run(|app_handle, event| {
         use tauri::Manager;

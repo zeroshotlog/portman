@@ -76,8 +76,14 @@ impl SqliteLabelRepository {
                 key_value: row.get(2)?,
                 name: row.get(3)?,
                 note: row.get(4)?,
-                created_at: DateTime::parse_from_rfc3339(&created_at_str).map(|dt| dt.with_timezone(&Utc)).unwrap_or_else(|_| Utc::now()),
-                updated_at: DateTime::parse_from_rfc3339(&updated_at_str).map(|dt| dt.with_timezone(&Utc)).unwrap_or_else(|_| Utc::now()),
+                created_at: DateTime::parse_from_rfc3339(&created_at_str).map(|dt| dt.with_timezone(&Utc)).unwrap_or_else(|e| {
+                    eprintln!("[Portman] Failed to parse created_at '{}': {}", created_at_str, e);
+                    Utc::now()
+                }),
+                updated_at: DateTime::parse_from_rfc3339(&updated_at_str).map(|dt| dt.with_timezone(&Utc)).unwrap_or_else(|e| {
+                    eprintln!("[Portman] Failed to parse updated_at '{}': {}", updated_at_str, e);
+                    Utc::now()
+                }),
             })
         })?;
 

@@ -3,8 +3,7 @@ use portman_core::{Portman, models::{Label, LabelKeyType}};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::sync::Mutex;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct JsonRpcRequest {
@@ -249,141 +248,142 @@ async fn handle_request(req: JsonRpcRequest, app: Arc<Mutex<AppState>>) -> JsonR
 
 async fn handle_tool_call(params: Option<&Value>, app: Arc<Mutex<AppState>>) -> Result<Value> {
     let params = params.ok_or_else(|| anyhow::anyhow!("Missing params"))?;
-    let name = params.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing tool name"))?;
+    let name = params.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing tool name"))?.to_string();
     let args = params.get("arguments").cloned().unwrap_or(json!({}));
 
-    let app = app.lock().await;
+    tokio::task::spawn_blocking(move || {
+        let app = app.lock().map_err(|e| anyhow::anyhow!("Lock error: {}", e))?;
 
-    match name {
-        "scan_listeners" => {
-             let listeners = app.portman.scan()?;
-             // Wrap in correct MCP tool result structure
-             Ok(json!({
-                 "content": [
-                     {
-                         "type": "text",
-                         "text": serde_json::to_string_pretty(&listeners)?
-                     }
-                 ]
-             }))
-        },
-        "who" => {
-            let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
-            let listeners = app.portman.scan()?;
-            let target = listeners.into_iter().find(|l| l.listener.port == port);
-             Ok(json!({
-                 "content": [
-                     {
-                         "type": "text",
-                         "text": serde_json::to_string_pretty(&target)?
-                     }
-                 ]
-             }))
-        },
-        "ports_find" => {
-            let start = args.get("range_start").and_then(|v| v.as_u64()).unwrap_or(3000) as u16;
-            let end = args.get("range_end").and_then(|v| v.as_u64()).unwrap_or(8000) as u16;
-            let count = args.get("count").and_then(|v| v.as_u64()).unwrap_or(10) as usize;
-            
-            let ports = app.portman.find_free_ports(start, end, count)?;
-            Ok(json!({
-                 "content": [
-                     {
-                         "type": "text",
-                         "text": serde_json::to_string_pretty(&ports)?
-                     }
-                 ]
-             }))
-        },
-        "label_list" => {
-            let labels = app.portman.get_labels()?;
-            Ok(json!({
-                 "content": [
-                     {
-                         "type": "text",
-                         "text": serde_json::to_string_pretty(&labels)?
-                     }
-                 ]
-             }))
-        },
-        "label_set_port" => {
-             let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
-             let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
-             let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
-             
-             let label = Label {
-                 id: None,
-                 key_type: LabelKeyType::Port,
-                 key_value: port.to_string(),
-                 name,
-                 note,
-                 created_at: chrono::Utc::now(),
-                 updated_at: chrono::Utc::now(),
-             };
-             app.portman.set_label(&label)?;
-             Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        "label_set_pid" => {
-             let pid = args.get("pid").and_then(|v| v.as_i64()).ok_or_else(|| anyhow::anyhow!("Missing pid"))? as i32;
-             let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
-             let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
-             
-             let label = Label {
-                 id: None,
-                 key_type: LabelKeyType::Pid,
-                 key_value: pid.to_string(),
-                 name,
-                 note,
-                 created_at: chrono::Utc::now(),
-                 updated_at: chrono::Utc::now(),
-             };
-             app.portman.set_label(&label)?;
-             Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        "label_set_pattern" => {
-             let pattern = args.get("pattern").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing pattern"))?.to_string();
-             let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
-             let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
-             
-             let label = Label {
-                 id: None,
-                 key_type: LabelKeyType::Pattern,
-                 key_value: pattern,
-                 name,
-                 note,
-                 created_at: chrono::Utc::now(),
-                 updated_at: chrono::Utc::now(),
-             };
-             app.portman.set_label(&label)?;
-             Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        "label_remove_port" => {
-             let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
-             app.portman.remove_label(LabelKeyType::Port, &port.to_string())?;
-              Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        "label_remove_pid" => {
-             let pid = args.get("pid").and_then(|v| v.as_i64()).ok_or_else(|| anyhow::anyhow!("Missing pid"))? as i32;
-             app.portman.remove_label(LabelKeyType::Pid, &pid.to_string())?;
-              Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        "label_remove_pattern" => {
-             let pattern = args.get("pattern").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing pattern"))?.to_string();
-             app.portman.remove_label(LabelKeyType::Pattern, &pattern)?;
-              Ok(json!({
-                 "content": [{ "type": "text", "text": "OK" }]
-             }))
-        },
-        _ => Err(anyhow::anyhow!("Tool not implemented: {}", name))
-    }
+        match name.as_str() {
+            "scan_listeners" => {
+                 let listeners = app.portman.scan()?;
+                 Ok(json!({
+                     "content": [
+                         {
+                             "type": "text",
+                             "text": serde_json::to_string_pretty(&listeners)?
+                         }
+                     ]
+                 }))
+            },
+            "who" => {
+                let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
+                let listeners = app.portman.scan()?;
+                let target = listeners.into_iter().find(|l| l.listener.port == port);
+                 Ok(json!({
+                     "content": [
+                         {
+                             "type": "text",
+                             "text": serde_json::to_string_pretty(&target)?
+                         }
+                     ]
+                 }))
+            },
+            "ports_find" => {
+                let start = args.get("range_start").and_then(|v| v.as_u64()).unwrap_or(3000) as u16;
+                let end = args.get("range_end").and_then(|v| v.as_u64()).unwrap_or(8000) as u16;
+                let count = args.get("count").and_then(|v| v.as_u64()).unwrap_or(10) as usize;
+
+                let ports = app.portman.find_free_ports(start, end, count)?;
+                Ok(json!({
+                     "content": [
+                         {
+                             "type": "text",
+                             "text": serde_json::to_string_pretty(&ports)?
+                         }
+                     ]
+                 }))
+            },
+            "label_list" => {
+                let labels = app.portman.get_labels()?;
+                Ok(json!({
+                     "content": [
+                         {
+                             "type": "text",
+                             "text": serde_json::to_string_pretty(&labels)?
+                         }
+                     ]
+                 }))
+            },
+            "label_set_port" => {
+                 let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
+                 let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
+                 let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
+
+                 let label = Label {
+                     id: None,
+                     key_type: LabelKeyType::Port,
+                     key_value: port.to_string(),
+                     name,
+                     note,
+                     created_at: chrono::Utc::now(),
+                     updated_at: chrono::Utc::now(),
+                 };
+                 app.portman.set_label(&label)?;
+                 Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            "label_set_pid" => {
+                 let pid = args.get("pid").and_then(|v| v.as_i64()).ok_or_else(|| anyhow::anyhow!("Missing pid"))? as i32;
+                 let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
+                 let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
+
+                 let label = Label {
+                     id: None,
+                     key_type: LabelKeyType::Pid,
+                     key_value: pid.to_string(),
+                     name,
+                     note,
+                     created_at: chrono::Utc::now(),
+                     updated_at: chrono::Utc::now(),
+                 };
+                 app.portman.set_label(&label)?;
+                 Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            "label_set_pattern" => {
+                 let pattern = args.get("pattern").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing pattern"))?.to_string();
+                 let name = args.get("name").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing name"))?.to_string();
+                 let note = args.get("note").and_then(|v| v.as_str()).map(|s| s.to_string());
+
+                 let label = Label {
+                     id: None,
+                     key_type: LabelKeyType::Pattern,
+                     key_value: pattern,
+                     name,
+                     note,
+                     created_at: chrono::Utc::now(),
+                     updated_at: chrono::Utc::now(),
+                 };
+                 app.portman.set_label(&label)?;
+                 Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            "label_remove_port" => {
+                 let port = args.get("port").and_then(|v| v.as_u64()).ok_or_else(|| anyhow::anyhow!("Missing port"))? as u16;
+                 app.portman.remove_label(LabelKeyType::Port, &port.to_string())?;
+                  Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            "label_remove_pid" => {
+                 let pid = args.get("pid").and_then(|v| v.as_i64()).ok_or_else(|| anyhow::anyhow!("Missing pid"))? as i32;
+                 app.portman.remove_label(LabelKeyType::Pid, &pid.to_string())?;
+                  Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            "label_remove_pattern" => {
+                 let pattern = args.get("pattern").and_then(|v| v.as_str()).ok_or_else(|| anyhow::anyhow!("Missing pattern"))?.to_string();
+                 app.portman.remove_label(LabelKeyType::Pattern, &pattern)?;
+                  Ok(json!({
+                     "content": [{ "type": "text", "text": "OK" }]
+                 }))
+            },
+            _ => Err(anyhow::anyhow!("Tool not implemented: {}", name))
+        }
+    }).await?
 }

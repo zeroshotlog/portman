@@ -39,6 +39,8 @@ macOS限定（`lsof`コマンドに依存）
 
 `portman-core` → `portman-mcp`（依存関係順。portman-cliは現状crates.io非公開）
 
-## 禁止事項
+## コミット・リリースルール
 
+- コミットメッセージは日本語で書くこと
+- リリースノートは英語で書くこと
 - コミットメッセージに `Co-Authored-By` を付けないこと

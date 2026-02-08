@@ -95,7 +95,7 @@ fn parse_lsof_output(output: &str) -> io::Result<Vec<LiveListener>> {
                 listeners.push(LiveListener {
                     port,
                     pid,
-                    process: command_name.clone(),
+                    process: command_name,
                     command: None,
                     inferred_type: inferred,
                     cwd: None,
